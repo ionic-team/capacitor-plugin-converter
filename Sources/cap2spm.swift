@@ -11,15 +11,18 @@ import ArgumentParser
 
 @main
 struct Cap2SPM: ParsableCommand {
-    @Argument(help: "The swift file to parse")
-    var filename: String
+    @Option(help: "ObjectiveC Plugin File")
+    var objcFile: String
+
+    @Option(help: "The swift file to parse")
+    var swiftFile: String
 
     mutating func run() throws {
-        let oldPluginFileParser = OldPluginParser(fileName: "/Users/mark/Test.m")
+        let oldPluginFileParser = OldPluginParser(fileName: objcFile)
         try oldPluginFileParser.parse()
         guard let capacitorPlugin = oldPluginFileParser.capacitorPlugin else { return }
 
-        let url = URL(fileURLWithPath: filename)
+        let url = URL(fileURLWithPath: swiftFile)
         let source = try String(contentsOf: url, encoding: .utf8)
         let sourceFile = Parser.parse(source: source)
         let incremented = AddPluginToClass(with: capacitorPlugin).visit(sourceFile)
