@@ -17,7 +17,13 @@ struct Cap2SPM: ParsableCommand {
     @Option(help: "The swift file to parse")
     var swiftFile: String
 
+    @Option(name: .customLong("package-json"), help: "Package package.json")
+    var packageJSONFilename: String
+
     mutating func run() throws {
+        let package = try PackageJSONParser(fileName: packageJSONFilename)
+        print(package)
+
         let oldPluginFileParser = OldPluginParser(fileName: objcFile)
         try oldPluginFileParser.parse()
         guard let capacitorPlugin = oldPluginFileParser.capacitorPlugin else { return }
