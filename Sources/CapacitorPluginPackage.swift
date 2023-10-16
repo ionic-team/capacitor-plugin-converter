@@ -7,7 +7,7 @@
 
 import Foundation
 
-class CapacitorPluginPackage {
-   
-
+struct CapacitorPluginPackage {
+    var pluginClassName: String
+    
 }

@@ -51,7 +51,7 @@
       </BuildableProductRunnable>
       <CommandLineArguments>
          <CommandLineArgument
-            argument = "/Users/mark/Test.swift"
+            argument = "/Users/mark/Developer/core/capacitor-plugins/geolocation"
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>
