@@ -33,8 +33,7 @@ struct PackageJSONParser: CustomDebugStringConvertible {
         return plugins
     }
 
-    init(fileName: String) throws {
-        let url = URL(fileURLWithPath: fileName)
+    init(with url: URL) throws {
         let data = try Data(contentsOf: url)
         package = try JSONDecoder().decode(PackageJSON.self, from: data)
         podspec = try findPodspec()

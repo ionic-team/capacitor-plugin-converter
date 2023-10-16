@@ -5,22 +5,16 @@ enum OldPluginParserError: Error {
     case pluginMissing
 }
 
-class OldPluginParser {
-    let fileName: String
-    var capacitorPlugin: CapacitorPluginSyntax?
+class OldPlugin {
+    var capacitorPlugin: CapacitorPluginSyntax
 
-    init(fileName: String) {
-        self.fileName = fileName
-    }
-
-    func parse() throws {
-        let url = URL(fileURLWithPath: fileName)
-        let pluginSourceText = try String(contentsOf: url, encoding: .utf8)
-        matchPlugin(text: pluginSourceText)
+    init(at fileURL: URL) throws {
+        let pluginSourceText = try String(contentsOf: fileURL, encoding: .utf8)
+        capacitorPlugin = try OldPlugin.matchPlugin(text: pluginSourceText)
         try matchMethods(text: pluginSourceText)
     }
 
-    private func matchPlugin(text: String) {
+    private static func matchPlugin(text: String) throws -> CapacitorPluginSyntax {
         let identiferRef = Reference(Substring.self)
         let jsNameRef = Reference(Substring.self)
 
@@ -43,7 +37,9 @@ class OldPluginParser {
         }
 
         if let match = text.firstMatch(of: pluginNameRegex) {
-            capacitorPlugin = CapacitorPluginSyntax(identifier: String(match[identiferRef]), jsName: String(match[jsNameRef]))
+            return CapacitorPluginSyntax(identifier: String(match[identiferRef]), jsName: String(match[jsNameRef]))
+        } else {
+            throw OldPluginParserError.pluginMissing
         }
     }
 
@@ -77,8 +73,6 @@ class OldPluginParser {
 
         let matches = text.matches(of: pluginMethodRegex)
 
-        guard capacitorPlugin != nil else { throw OldPluginParserError.pluginMissing }
-
         var pluginMethods: [CapacitorPluginMethod] = []
 
         for match in matches {
@@ -88,6 +82,6 @@ class OldPluginParser {
             }
         }
 
-        self.capacitorPlugin?.methods = pluginMethods
+        self.capacitorPlugin.methods = pluginMethods
     }
 }
