@@ -7,12 +7,32 @@
 
 import Foundation
 
-struct CapacitorPluginPackage {
+enum CapacitorPluginError: Error {
+    case objcFileCount(Int)
+    case oldPluginMissing
+
+    var message: String {
+        switch self {
+        case .objcFileCount(let numberOfFiles):
+            return "Found \(numberOfFiles) Objective-C *.m files, expected \(numberOfFiles)"
+        case .oldPluginMissing:
+            return "Can't find OldPlugin"
+        }
+    }
+}
+
+class CapacitorPluginPackage {
     let pluginDirectoryName: String
     let basePathURL: URL
     let packageJSONURL: URL
     let pluginSrcDirectoryURL: URL
     let files: [URL]
+
+    var objcFilename: String?
+    var objcHeaderFilename: String?
+    var swiftFilename: String?
+
+    var oldPlugin: OldPlugin?
 
     init(directoryName: String) throws {
         pluginDirectoryName = directoryName
@@ -30,4 +50,29 @@ struct CapacitorPluginPackage {
         files = try fileManager.contentsOfDirectory(at: pluginSrcDirectoryURL, includingPropertiesForKeys: nil)
     }
 
+    func findObjCPluginFile() throws -> URL {
+        if let objcFilename = objcFilename {
+            return URL(filePath: objcFilename, directoryHint: .notDirectory, relativeTo: basePathURL)
+        }
+
+        let mfiles = files.filter { $0.absoluteString.hasSuffix(".m") }
+
+        guard mfiles.count == 1, let url = mfiles.first else { throw CapacitorPluginError.objcFileCount(mfiles.count) }
+        
+        oldPlugin = try OldPlugin(at: url)
+
+        return url
+    }
+
+    func findSwiftPluginFile(from url: URL) throws -> URL {
+        if let swiftFilename = swiftFilename {
+            return URL(filePath: swiftFilename, directoryHint: .notDirectory, relativeTo: basePathURL)
+        }
+
+        guard let oldPlugin else { throw CapacitorPluginError.oldPluginMissing }
+
+        let fileName = "\(oldPlugin.capacitorPlugin.identifier).swift"
+
+        return URL(filePath: fileName, directoryHint: .notDirectory, relativeTo: pluginSrcDirectoryURL)
+    }
 }
