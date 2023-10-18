@@ -6,8 +6,6 @@ enum CapacitorPluginReturnType: String {
     case none
     case promise
     case callback
-    case watch
-    case sync
 
     init?(with typeString: String) {
         switch typeString {
@@ -17,10 +15,6 @@ enum CapacitorPluginReturnType: String {
             self = .promise
         case "CAPPluginReturnCallback":
             self = .callback
-        case "CAPPluginReturnWatch":
-            self = .watch
-        case "CAPPluginReturnSync":
-            self = .sync
         default:
             return nil
         }
