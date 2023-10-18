@@ -9,6 +9,7 @@ import Foundation
 
 enum CapacitorPluginError: Error {
     case objcFileCount(Int)
+    case objcHeaderCount(Int)
     case oldPluginMissing
 
     var message: String {
@@ -17,6 +18,8 @@ enum CapacitorPluginError: Error {
             return "Found \(numberOfFiles) Objective-C *.m files, expected \(numberOfFiles)"
         case .oldPluginMissing:
             return "Can't find OldPlugin"
+        case .objcHeaderCount(let numberOfFiles):
+            return "Found \(numberOfFiles) Objective-C Header files, expected \(numberOfFiles)"
         }
     }
 }
@@ -51,7 +54,7 @@ class CapacitorPluginPackage {
     }
 
     func findObjCPluginFile() throws -> URL {
-        if let objcFilename = objcFilename {
+        if let objcFilename {
             return URL(filePath: objcFilename, directoryHint: .notDirectory, relativeTo: basePathURL)
         }
 
@@ -60,6 +63,17 @@ class CapacitorPluginPackage {
         guard mfiles.count == 1, let url = mfiles.first else { throw CapacitorPluginError.objcFileCount(mfiles.count) }
         
         oldPlugin = try OldPlugin(at: url)
+
+        return url
+    }
+
+    func fundObjCHeaderFile() throws -> URL {
+        if let objcHeaderFilename {
+            return URL(filePath: objcHeaderFilename, directoryHint: .notDirectory, relativeTo: basePathURL)
+        }
+
+        let headerFiles = files.filter { $0.absoluteString.hasSuffix(".h") }
+        guard headerFiles.count == 1, let url = headerFiles.first else { throw CapacitorPluginError.objcFileCount(headerFiles.count) }
 
         return url
     }
