@@ -24,10 +24,22 @@ struct Cap2SPM: ParsableCommand {
     var pluginDirectory: String
 
     mutating func run() throws {
+        let mFileURL: URL
+        let swiftFileURL: URL
+
         let capacitorPluginPackage = try CapacitorPluginPackage(directoryName: pluginDirectory)
 
-        let mFileURL = try capacitorPluginPackage.findObjCPluginFile()
-        let swiftFileURL = try capacitorPluginPackage.findSwiftPluginFile(from: mFileURL)
+        if let objcFile {
+            mFileURL = URL(filePath: objcFile, directoryHint: .notDirectory)
+        } else {
+            mFileURL = try capacitorPluginPackage.findObjCPluginFile()
+        }
+
+        if let swiftFile {
+            swiftFileURL = URL(filePath: swiftFile, directoryHint: .notDirectory)
+        } else {
+            swiftFileURL = try capacitorPluginPackage.findSwiftPluginFile(from: mFileURL)
+        }
 
         let source = try String(contentsOf: swiftFileURL, encoding: .utf8)
         let sourceFile = Parser.parse(source: source)
