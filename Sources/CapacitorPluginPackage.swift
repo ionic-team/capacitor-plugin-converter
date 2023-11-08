@@ -67,7 +67,7 @@ class CapacitorPluginPackage {
         return url
     }
 
-    func fundObjCHeaderFile() throws -> URL {
+    func findObjCHeaderFile() throws -> URL {
         if let objcHeaderFilename {
             return URL(filePath: objcHeaderFilename, directoryHint: .notDirectory, relativeTo: basePathURL)
         }

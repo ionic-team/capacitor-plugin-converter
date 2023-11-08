@@ -1,6 +1,6 @@
 // The Swift Programming Language
 // https://docs.swift.org/swift-book
-// 
+//
 // Swift Argument Parser
 // https://swiftpackageindex.com/apple/swift-argument-parser/documentation
 
@@ -26,8 +26,15 @@ struct Cap2SPM: ParsableCommand {
     mutating func run() throws {
         let mFileURL: URL
         let swiftFileURL: URL
+        let hFileURL: URL
 
         let capacitorPluginPackage = try CapacitorPluginPackage(directoryName: pluginDirectory)
+
+        if let objcHeader {
+            hFileURL = URL(filePath: objcHeader, directoryHint: .notDirectory)
+        } else {
+            hFileURL = try capacitorPluginPackage.findObjCHeaderFile()
+        }
 
         if let objcFile {
             mFileURL = URL(filePath: objcFile, directoryHint: .notDirectory)
@@ -47,7 +54,18 @@ struct Cap2SPM: ParsableCommand {
         guard let capPlugin = capacitorPluginPackage.oldPlugin?.capacitorPlugin else { return }
 
         let incremented = AddPluginToClass(with: capPlugin).visit(sourceFile)
-        print(incremented)
+
+        let mFileBackup = mFileURL.appendingPathExtension("old")
+        let hFileBackup = hFileURL.appendingPathExtension("old")
+        let swiftFileBackup = swiftFileURL.appendingPathExtension("old")
+
+        try FileManager.default.moveItem(at: mFileURL, to: mFileBackup)
+        try FileManager.default.moveItem(at: hFileURL, to: hFileBackup)
+        try FileManager.default.moveItem(at: swiftFileURL, to: swiftFileBackup)
+        
+        var outputString: String = ""
+        incremented.write(to: &outputString)
+        try outputString.write(to: swiftFileURL, atomically: true, encoding: .utf8)
     }
 }
 
