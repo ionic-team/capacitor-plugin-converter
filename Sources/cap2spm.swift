@@ -5,6 +5,9 @@ import ArgumentParser
 
 @main
 struct Cap2SPM: ParsableCommand {
+    @Flag(name: .customLong("backup"), inversion: .prefixedNo, help: "Should we make a backup? Defaults to true")
+    var shouldBackup = true
+
     @Option(help: "Objective-C header for file containing CAP_PLUGIN macro")
     var objcHeader: String?
 
@@ -46,14 +49,27 @@ struct Cap2SPM: ParsableCommand {
 
         try modifySwiftFile(at: swiftFileURL, plugin: capPlugin)
 
-        try fileBackup(at: mFileURL)
-        try fileBackup(at: hFileURL)
+        let fileList = [mFileURL, hFileURL]
+        if shouldBackup {
+            try fileBackup(of: fileList)
+        } else {
+            try fileDelete(of: fileList)
+        }
     }
 
-    private func fileBackup(at fileURL: URL) throws {
-        let fileBackupURL = fileURL.appendingPathExtension("old")
-        print("Moving \(fileURL.path()) to \(fileBackupURL.path())")
-        try FileManager.default.moveItem(at: fileURL, to: fileBackupURL)
+    private func fileBackup(of fileURLs: [URL]) throws {
+        for fileURL in fileURLs {
+            let fileBackupURL = fileURL.appendingPathExtension("old")
+            print("Moving \(fileURL.path()) to \(fileBackupURL.path())...")
+            try FileManager.default.moveItem(at: fileURL, to: fileBackupURL)
+        }
+    }
+
+    private func fileDelete(of fileURLs: [URL]) throws {
+        for fileURL in fileURLs {
+            print("Deleting \(fileURL.path())...")
+            try FileManager.default.removeItem(at: fileURL)
+        }
     }
 
     private func modifySwiftFile(at fileURL: URL, plugin: CapacitorPluginSyntax) throws {
@@ -62,7 +78,11 @@ struct Cap2SPM: ParsableCommand {
 
         let incremented = AddPluginToClass(with: plugin).visit(sourceFile)
 
-        try fileBackup(at: fileURL)
+        if shouldBackup {
+            try fileBackup(of: [fileURL])
+        } else {
+            try fileDelete(of: [fileURL])
+        }
 
         var outputString: String = ""
         incremented.write(to: &outputString)

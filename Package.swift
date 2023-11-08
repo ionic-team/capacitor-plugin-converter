@@ -21,5 +21,13 @@ let package = Package(
                 .product(name: "SwiftParser", package: "swift-syntax")
             ]
         ),
+        .testTarget(name: "CapacitorConverterTests",
+                    dependencies: [
+                        .target(name: "cap2spm"),
+                        .product(name: "ArgumentParser", package: "swift-argument-parser"),
+                        .product(name: "SwiftSyntax", package: "swift-syntax"),
+                        .product(name: "SwiftParser", package: "swift-syntax")
+                    ]
+        )
     ]
 )
