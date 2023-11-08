@@ -1,9 +1,3 @@
-// The Swift Programming Language
-// https://docs.swift.org/swift-book
-//
-// Swift Argument Parser
-// https://swiftpackageindex.com/apple/swift-argument-parser/documentation
-
 import Foundation
 import SwiftParser
 import SwiftSyntax
@@ -48,25 +42,30 @@ struct Cap2SPM: ParsableCommand {
             swiftFileURL = try capacitorPluginPackage.findSwiftPluginFile(from: mFileURL)
         }
 
-        let source = try String(contentsOf: swiftFileURL, encoding: .utf8)
-        let sourceFile = Parser.parse(source: source)
-
         guard let capPlugin = capacitorPluginPackage.oldPlugin?.capacitorPlugin else { return }
 
-        let incremented = AddPluginToClass(with: capPlugin).visit(sourceFile)
+        try modifySwiftFile(at: swiftFileURL, plugin: capPlugin)
 
-        let mFileBackup = mFileURL.appendingPathExtension("old")
-        let hFileBackup = hFileURL.appendingPathExtension("old")
-        let swiftFileBackup = swiftFileURL.appendingPathExtension("old")
+        try fileBackup(at: mFileURL)
+        try fileBackup(at: hFileURL)
+    }
 
-        try FileManager.default.moveItem(at: mFileURL, to: mFileBackup)
-        try FileManager.default.moveItem(at: hFileURL, to: hFileBackup)
-        try FileManager.default.moveItem(at: swiftFileURL, to: swiftFileBackup)
-        
+    private func fileBackup(at fileURL: URL) throws {
+        let fileBackupURL = fileURL.appendingPathExtension("old")
+        print("Moving \(fileURL.path()) to \(fileBackupURL.path())")
+        try FileManager.default.moveItem(at: fileURL, to: fileBackupURL)
+    }
+
+    private func modifySwiftFile(at fileURL: URL, plugin: CapacitorPluginSyntax) throws {
+        let source = try String(contentsOf: fileURL, encoding: .utf8)
+        let sourceFile = Parser.parse(source: source)
+
+        let incremented = AddPluginToClass(with: plugin).visit(sourceFile)
+
+        try fileBackup(at: fileURL)
+
         var outputString: String = ""
         incremented.write(to: &outputString)
-        try outputString.write(to: swiftFileURL, atomically: true, encoding: .utf8)
+        try outputString.write(to: fileURL, atomically: true, encoding: .utf8)
     }
 }
-
-

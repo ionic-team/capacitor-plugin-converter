@@ -1,0 +1,24 @@
+name: Release Cap2SPM
+
+on:
+    push:
+        tags:
+            '*.*.*'
+
+jobs:
+    release:
+        runs-on: macos-latest
+        steps:
+            - uses: actions/checkout@v4
+            - uses: swift-actions/setup-swift@v1
+              with:
+                swift-version: "5.9"
+            - name: Build for Release
+              run: swift build -c release --arch arm64 --arch x86_64 --product cap2spm
+            - name: Zip Executable
+              run: zip cap2spm-${{ github.ref_name }}.zip .build/apple/Products/Release/cap2spm
+            - name: Create Release
+              uses: softprops/action-gh-release@v1
+              with:
+                files: cap2spm-${{ github.ref_name }}.zip
+                token: ${{ secrets.GITHUB_TOKEN }}
