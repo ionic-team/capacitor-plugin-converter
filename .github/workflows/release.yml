@@ -16,7 +16,7 @@ jobs:
             - name: Build for Release
               run: swift build -c release --arch arm64 --arch x86_64 --product cap2spm
             - name: Zip Executable
-              run: zip cap2spm-${{ github.ref_name }}.zip .build/apple/Products/Release/cap2spm
+              run: zip -j cap2spm-${{ github.ref_name }}.zip .build/apple/Products/Release/cap2spm
             - name: Create Release
               uses: softprops/action-gh-release@v1
               with:
