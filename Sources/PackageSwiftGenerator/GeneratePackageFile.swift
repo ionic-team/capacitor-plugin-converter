@@ -1,47 +1,48 @@
 import Foundation
-import SwiftSyntax
-
 
 class GeneratePackageFile {
     let defaultIndent = 4
+    let packageName: String
+    let libName: String
+    let capRepoName = "capacitor6-spm-test"
+    let capLocation = "https://github.com/ionic-team/capacitor6-spm-test.git"
+    let capVersion = "main"
 
-    func create() {
-        let identiferPattern = IdentifierPatternSyntax(leadingTrivia: .space,
-                                                       identifier: .identifier("package"))
+    var packageText: String {
+        return """
+            // swift-tools-version: 5.9
+            import PackageDescription
 
-        let packageExpression = DeclReferenceExprSyntax(baseName: .identifier("Package"))
+            let package = Package(
+                name: "\(packageName)",
+                platforms: [.iOS(.v13)],
+                products: [
+                    .library(
+                        name: "\(libName)",
+                        targets: ["\(libName)"])
+                ],
+                dependencies: [
+                    .package(url: "\(capLocation)", branch: "\(capVersion)")
+                ],
+                targets: [
+                    .target(
+                        name: "\(libName)",
+                        dependencies: [
+                            .product(name: "Capacitor", package: "\(capRepoName)"),
+                            .product(name: "Cordova", package: "\(capRepoName)")
+                        ],
+                        path: "ios/Sources/\(libName)"),
+                    .testTarget(
+                        name: "\(libName)Tests",
+                        dependencies: ["\(libName)"],
+                        path: "ios/Tests/\(libName)Tests")
+                ]
+            )
+            """
+    }
 
-        let stringSegmentList = StringLiteralSegmentListSyntax(arrayLiteral:
-                .stringSegment(StringSegmentSyntax(content: .stringSegment("MyPluginName"))))
-
-        let stringLiteralExpr = StringLiteralExprSyntax(openingQuote: .stringQuoteToken(),
-                                                        segments: stringSegmentList,
-                                                        closingQuote: .stringQuoteToken())
-
-
-        let firstArg = LabeledExprSyntax(label: .identifier("name"), expression: stringLiteralExpr)
-        let arguments = LabeledExprListSyntax(arrayLiteral: firstArg)
-
-        let packageFunctionCall = FunctionCallExprSyntax(calledExpression: packageExpression, leftParen: .leftParenToken(), arguments: arguments, rightParen: .rightParenToken(), trailingTrivia: .space)
-
-        let initalizerClause = InitializerClauseSyntax(equal: .equalToken(leadingTrivia: .space, trailingTrivia: .space),
-                                                       value: packageFunctionCall)
-
-        let patternBinding = PatternBindingSyntax(pattern: identiferPattern, initializer: initalizerClause)
-
-        let indentifierDecl = VariableDeclSyntax(leadingTrivia: .spaces(defaultIndent),
-                                                 bindingSpecifier: .keyword(.let),
-                                                 bindings: PatternBindingListSyntax(arrayLiteral: patternBinding),
-                                                 trailingTrivia: .space)
-
-        let defDecl = DeclSyntax(fromProtocol: indentifierDecl)
-
-        let codeBlock = CodeBlockItemSyntax(item: .decl(defDecl))
-
-        let codeBlockList = CodeBlockItemListSyntax(arrayLiteral: codeBlock)
-
-        let source = SourceFileSyntax(statements: codeBlockList)
-
-        print(source.description)
+    init(packageName: String, libName: String) {
+        self.packageName = packageName
+        self.libName = libName
     }
 }
