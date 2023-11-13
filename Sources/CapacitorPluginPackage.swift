@@ -29,11 +29,13 @@ class CapacitorPluginPackage {
     let basePathURL: URL
     let packageJSONURL: URL
     let pluginSrcDirectoryURL: URL
+    let podspecURL: URL
     let files: [URL]
 
     var objcFilename: String?
     var objcHeaderFilename: String?
     var swiftFilename: String?
+    var podspecFilename: String?
 
     var oldPlugin: OldPlugin?
 
@@ -49,6 +51,7 @@ class CapacitorPluginPackage {
         let firstPluginDirectory = package.pluginDirectories.first ?? ""
 
         pluginSrcDirectoryURL = URL(filePath: firstPluginDirectory, directoryHint: .isDirectory, relativeTo: basePathURL)
+        podspecURL = URL(filePath: package.podspec, directoryHint: .notDirectory, relativeTo: pluginSrcDirectoryURL)
 
         files = try fileManager.contentsOfDirectory(at: pluginSrcDirectoryURL, includingPropertiesForKeys: nil)
     }
@@ -88,5 +91,5 @@ class CapacitorPluginPackage {
         let fileName = "\(oldPlugin.capacitorPlugin.identifier).swift"
 
         return URL(filePath: fileName, directoryHint: .notDirectory, relativeTo: pluginSrcDirectoryURL)
-    }
+    } 
 }

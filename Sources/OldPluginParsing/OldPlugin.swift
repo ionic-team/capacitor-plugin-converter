@@ -3,6 +3,7 @@ import RegexBuilder
 
 enum OldPluginParserError: Error {
     case pluginMissing
+    case podspecNameMissing
 }
 
 class OldPlugin {

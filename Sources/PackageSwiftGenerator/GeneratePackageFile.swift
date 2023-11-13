@@ -1,7 +1,6 @@
 import Foundation
 
 class GeneratePackageFile {
-    let defaultIndent = 4
     let packageName: String
     let libName: String
     let capRepoName = "capacitor6-spm-test"
