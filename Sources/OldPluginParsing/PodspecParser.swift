@@ -4,8 +4,7 @@ import RegexBuilder
 struct PodspecParser {
     let podName: String
 
-    init(at fileName: String) throws {
-        let fileURL = URL(filePath: fileName, directoryHint: .notDirectory)
+    init(at fileURL: URL) throws {
         let pluginSourceText = try String(contentsOf: fileURL, encoding: .utf8)
         podName = try PodspecParser.podnameMatcher(text: pluginSourceText)
     }

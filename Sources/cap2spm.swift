@@ -42,12 +42,15 @@ struct Cap2SPM: ParsableCommand {
         if let swiftFile {
             swiftFileURL = URL(filePath: swiftFile, directoryHint: .notDirectory)
         } else {
-            swiftFileURL = try capacitorPluginPackage.findSwiftPluginFile(from: mFileURL)
+            swiftFileURL = try capacitorPluginPackage.findSwiftPluginFile()
         }
+
+        let packageSwiftFileURL = try capacitorPluginPackage.findPodspecFile()
 
         guard let capPlugin = capacitorPluginPackage.oldPlugin?.capacitorPlugin else { return }
 
         try modifySwiftFile(at: swiftFileURL, plugin: capPlugin)
+        try generatePackageSwiftFile(at: packageSwiftFileURL, plugin: capPlugin)
 
         let fileList = [mFileURL, hFileURL]
         if shouldBackup {
@@ -87,5 +90,15 @@ struct Cap2SPM: ParsableCommand {
         var outputString: String = ""
         incremented.write(to: &outputString)
         try outputString.write(to: fileURL, atomically: true, encoding: .utf8)
+    }
+
+    private func generatePackageSwiftFile(at fileURL: URL, plugin: CapacitorPluginSyntax) throws {
+        let podspec = try PodspecParser(at: fileURL)
+        
+        let packageFileURL = URL(filePath: "Package.swift", directoryHint: .notDirectory, relativeTo: fileURL.baseURL)
+        let packageFile = GeneratePackageFile(packageName: podspec.podName, libName: plugin.identifier)
+        let packageFileString = packageFile.packageText
+
+        try packageFileString.write(to: packageFileURL, atomically: true, encoding: .utf8)
     }
 }
