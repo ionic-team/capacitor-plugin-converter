@@ -6,11 +6,28 @@
 This package builds a binary cap2spm that allows for the following:
 
 - To read Plugin.m and Plugin.h files and modify your Plugin.swift file to allow them to be removed
-- **COMING SOON:** you will be able to generate a Package.swift for your plugin to be useable with Capacitor SPM
+- Generate a Package.swift for your plugin to be useable with Capacitor SPM
 
 The easiest way to install is via curl:
 ```
 curl -OL https://github.com/ionic-team/capacitor-plugin-converter/releases/latest/download/cap2spm.zip
+```
+
+```
+USAGE: cap2-spm [--backup] [--no-backup] [--objc-header <objc-header>] [--objc-file <objc-file>] [--swift-file <swift-file>] <plugin-directory>
+
+ARGUMENTS:
+  <plugin-directory>      Plugin Directory
+
+OPTIONS:
+  --backup/--no-backup    Should we make a backup? (default: --backup)
+  --objc-header <objc-header>
+                          Objective-C header for file containing CAP_PLUGIN
+                          macro
+  --objc-file <objc-file> Objective-C file containing CAP_PLUGIN macro
+  --swift-file <swift-file>
+                          Swift file containing class inheriting from CAPPlugin
+  -h, --help              Show help information.
 ```
 
 
