@@ -63,6 +63,10 @@ class CapacitorPluginPackage {
         return url
     }
 
+    func parseObjCPluginFile(at url: URL) throws {
+        oldPlugin = try OldPlugin(at: url)
+    }
+
     func findObjCHeaderFile() throws -> URL {
         let headerFiles = files.filter { $0.absoluteString.hasSuffix(".h") }
         guard headerFiles.count == 1, let url = headerFiles.first else { throw CapacitorPluginError.objcFileCount(headerFiles.count) }

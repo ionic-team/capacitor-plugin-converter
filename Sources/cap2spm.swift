@@ -35,6 +35,7 @@ struct Cap2SPM: ParsableCommand {
 
         if let objcFile {
             mFileURL = URL(filePath: objcFile, directoryHint: .notDirectory)
+            try capacitorPluginPackage.parseObjCPluginFile(at: mFileURL)
         } else {
             mFileURL = try capacitorPluginPackage.findObjCPluginFile()
         }
