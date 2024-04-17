@@ -3,8 +3,8 @@ import Foundation
 class GeneratePackageFile {
     let packageName: String
     let libName: String
-    let capRepoName = "capacitor6-spm-test"
-    let capLocation = "https://github.com/ionic-team/capacitor6-spm-test.git"
+    let capRepoName = "capacitor-swift-pm"
+    let capLocation = "https://github.com/ionic-team/capacitor-swift-pm.git"
     let capVersion = "main"
 
     var packageText: String {
