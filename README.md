@@ -14,7 +14,7 @@ curl -OL https://github.com/ionic-team/capacitor-plugin-converter/releases/lates
 ```
 
 ```
-USAGE: cap2-spm [options] <plugin-directory>
+USAGE: cap2spm [options] <plugin-directory>
 
 ARGUMENTS:
   <plugin-directory>      Plugin Directory
