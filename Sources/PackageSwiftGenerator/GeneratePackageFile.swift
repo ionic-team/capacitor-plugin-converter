@@ -14,14 +14,14 @@ class GeneratePackageFile {
 
             let package = Package(
                 name: "\(packageName)",
-                platforms: [.iOS(.v13)],
+                platforms: [.iOS(.v14)],
                 products: [
                     .library(
                         name: "\(libName)",
                         targets: ["\(libName)"])
                 ],
                 dependencies: [
-                    .package(url: "\(capLocation)", branch: "\(capVersion)")
+                    .package(url: "\(capLocation)", from: "\(capVersion)")
                 ],
                 targets: [
                     .target(
