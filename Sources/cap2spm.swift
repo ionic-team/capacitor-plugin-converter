@@ -6,7 +6,7 @@ import ArgumentParser
 @main
 struct Cap2SPM: ParsableCommand {
     @Flag(name: .customLong("backup"), inversion: .prefixedNo, help: "Should we make a backup?")
-    var shouldBackup = true
+    var shouldBackup = false
 
     @Option(help: "Objective-C header for file containing CAP_PLUGIN macro")
     var objcHeader: String?

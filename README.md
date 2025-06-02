@@ -20,7 +20,7 @@ ARGUMENTS:
   <plugin-directory>      Plugin Directory
 
 OPTIONS:
-  --backup/--no-backup    Should we make a backup? (default: --backup)
+  --backup/--no-backup    Should we make a backup? (default: --no-backup)
   --objc-header <objc-header>
                           Objective-C header for file containing CAP_PLUGIN
                           macro
