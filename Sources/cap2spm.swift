@@ -51,6 +51,8 @@ struct Cap2SPM: ParsableCommand {
         guard let capPlugin = capacitorPluginPackage.oldPlugin?.capacitorPlugin else { return }
 
         try modifySwiftFile(at: swiftFileURL, plugin: capPlugin)
+        try moveItemCreatingIntermediaryDirectories(at: swiftFileURL, to: capacitorPluginPackage.iosSrcDirectoryURL.appending(path: "Sources").appending(path: capPlugin.identifier).appending(path: swiftFileURL.lastPathComponent))
+        try moveItemCreatingIntermediaryDirectories(at: capacitorPluginPackage.iosSrcDirectoryURL.appending(path: "PluginTests"), to: capacitorPluginPackage.iosSrcDirectoryURL.appending(path: "Tests").appending(path: "\(capPlugin.identifier)Tests"))
         try generatePackageSwiftFile(at: packageSwiftFileURL, plugin: capPlugin)
 
         let fileList = [mFileURL, hFileURL]
@@ -101,5 +103,14 @@ struct Cap2SPM: ParsableCommand {
         let packageFileString = packageFile.packageText
 
         try packageFileString.write(to: packageFileURL, atomically: true, encoding: .utf8)
+    }
+
+    private func moveItemCreatingIntermediaryDirectories(at: URL, to: URL) throws {
+        print("Moving \(at.path()) to \(to.path())...")
+        let parentPath = to.deletingLastPathComponent()
+        if !FileManager.default.fileExists(atPath: parentPath.path) {
+            try FileManager.default.createDirectory(at: parentPath, withIntermediateDirectories: true, attributes: nil)
+        }
+        try FileManager.default.moveItem(at: at, to: to)
     }
 }
