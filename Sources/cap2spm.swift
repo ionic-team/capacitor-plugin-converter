@@ -51,8 +51,6 @@ struct Cap2SPM: ParsableCommand {
         guard let capPlugin = capacitorPluginPackage.oldPlugin?.capacitorPlugin else { return }
 
         try modifySwiftFile(at: swiftFileURL, plugin: capPlugin)
-        try moveItemCreatingIntermediaryDirectories(at: swiftFileURL, to: capacitorPluginPackage.iosSrcDirectoryURL.appending(path: "Sources").appending(path: capPlugin.identifier).appending(path: swiftFileURL.lastPathComponent))
-        try moveItemCreatingIntermediaryDirectories(at: capacitorPluginPackage.iosSrcDirectoryURL.appending(path: "PluginTests"), to: capacitorPluginPackage.iosSrcDirectoryURL.appending(path: "Tests").appending(path: "\(capPlugin.identifier)Tests"))
         try generatePackageSwiftFile(at: packageSwiftFileURL, plugin: capPlugin)
 
         let fileList = [mFileURL, hFileURL]
@@ -61,6 +59,8 @@ struct Cap2SPM: ParsableCommand {
         } else {
             try fileDelete(of: fileList)
         }
+        try moveItemCreatingIntermediaryDirectories(at: capacitorPluginPackage.iosSrcDirectoryURL.appending(path: "Plugin"), to: capacitorPluginPackage.iosSrcDirectoryURL.appending(path: "Sources").appending(path: capPlugin.identifier))
+        try moveItemCreatingIntermediaryDirectories(at: capacitorPluginPackage.iosSrcDirectoryURL.appending(path: "PluginTests"), to: capacitorPluginPackage.iosSrcDirectoryURL.appending(path: "Tests").appending(path: "\(capPlugin.identifier)Tests"))
     }
 
     private func fileBackup(of fileURLs: [URL]) throws {
