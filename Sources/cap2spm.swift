@@ -53,10 +53,14 @@ struct Cap2SPM: ParsableCommand {
         try modifySwiftFile(at: swiftFileURL, plugin: capPlugin)
         try generatePackageSwiftFile(at: packageSwiftFileURL, plugin: capPlugin)
 
-        let fileList = [mFileURL, hFileURL]
+        var fileList = [mFileURL, hFileURL]
         if shouldBackup {
             try fileBackup(of: fileList)
         } else {
+            let oldFiles = ["Plugin/Info.plist", "PluginTests/Info.plist", "Plugin.xcodeproj", "Plugin.xcworkspace", "Podfile"].compactMap {
+                capacitorPluginPackage.iosSrcDirectoryURL.appending(path: $0)
+            }
+            fileList.append(contentsOf: oldFiles)
             try fileDelete(of: fileList)
         }
         try moveItemCreatingIntermediaryDirectories(at: capacitorPluginPackage.iosSrcDirectoryURL.appending(path: "Plugin"), to: capacitorPluginPackage.iosSrcDirectoryURL.appending(path: "Sources").appending(path: capPlugin.identifier))
