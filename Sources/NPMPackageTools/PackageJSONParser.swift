@@ -32,6 +32,10 @@ struct PackageJSONParser: CustomDebugStringConvertible {
 
         return plugins
     }
+    
+    var scripts: [String: String] {
+        package.scripts
+    }
 
     init(with url: URL) throws {
         let data = try Data(contentsOf: url)
