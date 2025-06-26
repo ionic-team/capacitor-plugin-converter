@@ -44,6 +44,18 @@ let package = Package(
                         .target(name: "JavascriptPackageTools"),
                     ],
                     resources: [.copy("package-test.json")]
-        )
+        ),
+        .testTarget(name: "CapacitorPluginSyntaxToolsTests",
+                dependencies: [
+                    .target(name: "CapacitorPluginSyntaxTools"),
+                    .product(name: "SwiftSyntax", package: "swift-syntax"),
+                    .product(name: "SwiftParser", package: "swift-syntax")
+                ]
+        ),
+        .testTarget(name: "CapacitorPluginToolsTests",
+                dependencies: [
+                    .target(name: "CapacitorPluginTools")
+                ]
+        ),
     ]
 )

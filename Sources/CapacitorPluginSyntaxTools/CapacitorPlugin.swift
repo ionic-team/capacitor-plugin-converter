@@ -25,17 +25,3 @@ public struct CapacitorPlugin {
         try outputString.write(to: fileURL, atomically: true, encoding: .utf8)
     }
 }
-
-public struct CapacitorPluginMethod {
-    public let methodName: String
-    public let returnType: CapacitorPluginReturnType
-    
-    var syntax: CapacitorPluginMethodSyntax {
-        CapacitorPluginMethodSyntax(methodName: methodName, returnType: returnType)
-    }
-    
-    public init(methodName: String, returnType: CapacitorPluginReturnType) {
-        self.methodName = methodName
-        self.returnType = returnType
-    }
-}
