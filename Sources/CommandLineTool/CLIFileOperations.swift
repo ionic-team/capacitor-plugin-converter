@@ -32,4 +32,29 @@ extension Cap2SPM {
             try FileManager.default.removeItem(at: fileURL)
         }
     }
+
+    private func modifyGitignores(with package: CapacitorPluginPackage) throws {
+        let baseEntries = ["/Packages", "xcuserdata/" ,"DerivedData/", ".swiftpm/configuration/registries.json", ".swiftpm/xcode/package.xcworkspace/contents.xcworkspacedata", ".netrc"]
+        var rootEntries = ["Pods", "Podfile.lock", "Package.resolved", "Build", "xcuserdata", "/.build"]
+        rootEntries.append(contentsOf: baseEntries)
+        var iosEntries = [".DS_Store", ".build"]
+        iosEntries.append(contentsOf: baseEntries)
+        let rootGitignore = package.basePathURL.appending(path: ".gitignore")
+        let iOSGitignore = package.iosSrcDirectoryURL.appending(path: ".gitignore")
+        try modifyGitignore(at: rootGitignore, with: rootEntries)
+        try modifyGitignore(at: iOSGitignore, with: iosEntries)
+    }
+
+    private func modifyGitignore(at fileURL: URL, with content: [String]) throws {
+        var gitignoreText = ""
+        if FileManager.default.fileExists(atPath: fileURL.path()) {
+            gitignoreText = try String(contentsOf: fileURL, encoding: .utf8)
+        }
+        content.forEach {
+            if !gitignoreText.contains($0) {
+                gitignoreText.append("\n\($0)")
+            }
+        }
+        try gitignoreText.write(to: fileURL, atomically: true, encoding: .utf8)
+    }
 }
