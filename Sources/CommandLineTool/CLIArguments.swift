@@ -1,15 +1,7 @@
-//
-//  File.swift
-//  capacitor-plugin-converter
-//
-//  Created by Mark Emer Anderson on 6/25/25.
-//
-
 import Foundation
 import CapacitorPluginTools
 
 extension Cap2SPM {
-    
     func getUrlsForArgs(package: CapacitorPluginPackage,
                         objcHeader: String?,
                         objcFile: String?,
@@ -40,5 +32,4 @@ extension Cap2SPM {
         
         return (mFileURL, swiftFileURL, hFileURL)
     }
-   
 }
