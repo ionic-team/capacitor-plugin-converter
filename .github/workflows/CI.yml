@@ -1,3 +1,5 @@
+name: Build and Test
+
 on:
   pull_request:
     branches:
@@ -10,7 +12,8 @@ permissions:
   contents: read
 
 jobs:
-    release:
+    test:
+        name: Run Tests
         runs-on: macos-latest
         steps:
             - uses: actions/checkout@v4
