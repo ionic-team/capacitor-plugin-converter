@@ -1,0 +1,20 @@
+on:
+  pull_request:
+    branches:
+    - main
+  push:
+    branches:
+    - main
+
+jobs:
+    release:
+        runs-on: macos-latest
+        steps:
+            - uses: actions/checkout@v4
+            - uses: swift-actions/setup-swift@v1
+              with:
+                swift-version: "6.1"
+            - name: Build
+              run: swift build
+            - name: Tests
+              run: swift tests
