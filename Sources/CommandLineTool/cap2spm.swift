@@ -45,17 +45,18 @@ struct Cap2SPM: ParsableCommand {
         
         try packageGenerator.generateFile(at: podspecFileURL)
         
-        try moveItemCreatingIntermediaryDirectories(at: capacitorPluginPackage.iosSrcDirectoryURL.appending(path: "Plugin"), to: capacitorPluginPackage.iosSrcDirectoryURL.appending(path: "Sources").appending(path: capPlugin.identifier))
-        
-        try moveItemCreatingIntermediaryDirectories(at: capacitorPluginPackage.iosSrcDirectoryURL.appending(path: "PluginTests"), to: capacitorPluginPackage.iosSrcDirectoryURL.appending(path: "Tests").appending(path: "\(capPlugin.identifier)Tests"))
-        
-        
         var unneededFiles = [hFileURL, mFileURL]
-        let oldFiles = ["Plugin/Info.plist", "PluginTests/Info.plist", "Plugin.xcodeproj", "Plugin.xcworkspace", "Podfile"].compactMap {
+        let oldFiles = ["Plugin/Info.plist",
+                        "PluginTests/Info.plist",
+                        "Plugin.xcodeproj",
+                        "Plugin.xcworkspace",
+                        "Podfile"].compactMap {
             capacitorPluginPackage.iosSrcDirectoryURL.appending(path: $0)
         }
         unneededFiles.append(contentsOf: oldFiles)
         
         try deleteFiles(at: unneededFiles, shouldBackup: shouldBackup)
+
+        try modifyGitignores(for: capacitorPluginPackage)
     }
 }

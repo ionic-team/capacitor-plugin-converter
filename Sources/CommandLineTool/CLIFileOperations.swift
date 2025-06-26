@@ -1,4 +1,5 @@
 import Foundation
+import CapacitorPluginTools
 
 extension Cap2SPM {
     func deleteFiles(at fileList: [URL], shouldBackup: Bool) throws {
@@ -7,6 +8,16 @@ extension Cap2SPM {
         } else {
             try fileDelete(of: fileList)
         }
+    }
+    
+    func moveSourceDirectories(for package: CapacitorPluginPackage) throws {
+        guard let identifer = package.plugin?.identifier else { return }
+        
+        try moveItemCreatingIntermediaryDirectories(at: package.iosSrcDirectoryURL.appending(path: "Plugin"),
+                                                    to: package.iosSrcDirectoryURL.appending(path: "Sources").appending(path: identifer))
+        
+        try moveItemCreatingIntermediaryDirectories(at: package.iosSrcDirectoryURL.appending(path: "PluginTests"),
+                                                    to: package.iosSrcDirectoryURL.appending(path: "Tests").appending(path: "\(identifer)Tests"))
     }
 
     func moveItemCreatingIntermediaryDirectories(at: URL, to: URL) throws {
@@ -33,19 +44,31 @@ extension Cap2SPM {
         }
     }
 
-    private func modifyGitignores(with package: CapacitorPluginPackage) throws {
-        let baseEntries = ["/Packages", "xcuserdata/" ,"DerivedData/", ".swiftpm/configuration/registries.json", ".swiftpm/xcode/package.xcworkspace/contents.xcworkspacedata", ".netrc"]
-        var rootEntries = ["Pods", "Podfile.lock", "Package.resolved", "Build", "xcuserdata", "/.build"]
-        rootEntries.append(contentsOf: baseEntries)
-        var iosEntries = [".DS_Store", ".build"]
-        iosEntries.append(contentsOf: baseEntries)
+    func modifyGitignores(for package: CapacitorPluginPackage) throws {
+        let baseEntries = ["/Packages",
+                           "xcuserdata/",
+                           "DerivedData/",
+                           ".swiftpm/configuration/registries.json",
+                           ".swiftpm/xcode/package.xcworkspace/contents.xcworkspacedata",
+                           ".netrc"]
+        
+        let rootEntries = ["Pods",
+                           "Podfile.lock",
+                           "Package.resolved",
+                           "Build",
+                           "xcuserdata",
+                           "/.build"]
+        
+        let iosEntries = [".DS_Store", ".build"]
+                    
         let rootGitignore = package.basePathURL.appending(path: ".gitignore")
         let iOSGitignore = package.iosSrcDirectoryURL.appending(path: ".gitignore")
-        try modifyGitignore(at: rootGitignore, with: rootEntries)
-        try modifyGitignore(at: iOSGitignore, with: iosEntries)
+        
+        try modifyGitignore(at: rootGitignore, with: baseEntries + rootEntries)
+        try modifyGitignore(at: iOSGitignore, with: baseEntries + iosEntries)
     }
-
-    private func modifyGitignore(at fileURL: URL, with content: [String]) throws {
+    
+    func modifyGitignore(at fileURL: URL, with content: [String]) throws {
         var gitignoreText = ""
         if FileManager.default.fileExists(atPath: fileURL.path()) {
             gitignoreText = try String(contentsOf: fileURL, encoding: .utf8)
