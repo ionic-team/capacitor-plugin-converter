@@ -1,6 +1,6 @@
 import Foundation
 
-class GeneratePackageFile {
+public class PackageFileGenerator {
     let packageName: String
     let libName: String
     let capRepoName = "capacitor-swift-pm"
@@ -40,8 +40,15 @@ class GeneratePackageFile {
             """
     }
 
-    init(packageName: String, libName: String) {
+    public init(packageName: String, libName: String) {
         self.packageName = packageName
         self.libName = libName
+    }
+    
+    public func generateFile(at fileURL: URL) throws {
+        let packageFileURL = URL(filePath: "Package.swift", directoryHint: .notDirectory, relativeTo: fileURL.baseURL)
+        let packageFileString = packageText
+
+        try packageFileString.write(to: packageFileURL, atomically: true, encoding: .utf8)
     }
 }

@@ -3,16 +3,14 @@ import SwiftSyntax
 import SwiftParser
 
 struct CapacitorPluginSyntax {
-    let identifier: String
-    let jsName: String
-    var methods: [CapacitorPluginMethod] = []
-
+    let plugin: CapacitorPlugin
+    
     let defaultIndent = 4
-
+    
     func createMemberBlock() -> MemberBlockItemListSyntax {
-        let pluginIdentifier = addPublicStringConstantVariable(variableName: "identifier", stringValue: identifier)
+        let pluginIdentifier = addPublicStringConstantVariable(variableName: "identifier", stringValue: plugin.identifier)
 
-        let jsName = addPublicStringConstantVariable(variableName: "jsName", stringValue: jsName)
+        let jsName = addPublicStringConstantVariable(variableName: "jsName", stringValue: plugin.jsName)
 
         let pluginMethods = addPluginMethodDeclarations()
 
@@ -88,9 +86,9 @@ struct CapacitorPluginSyntax {
 
         var functionArray: [ArrayElementSyntax] = []
 
-        for method in methods {
+        for method in plugin.methods {
             let arrayElement = ArrayElementSyntax(leadingTrivia: .spaces(defaultIndent*2),
-                                                  expression: method.functionCallExpr,
+                                                  expression: method.syntax.functionCallExpr,
                                                   trailingComma: .commaToken(trailingTrivia: .newline))
 
             functionArray.append(arrayElement)

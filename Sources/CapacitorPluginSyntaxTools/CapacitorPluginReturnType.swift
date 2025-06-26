@@ -2,12 +2,12 @@ import Foundation
 import SwiftSyntax
 import SwiftParser
 
-enum CapacitorPluginReturnType: String {
+public enum CapacitorPluginReturnType: String {
     case none
     case promise
     case callback
 
-    init?(with typeString: String) {
+    public init?(with typeString: String) {
         switch typeString {
         case "CAPPluginReturnNone":
             self = .none

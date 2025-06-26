@@ -2,10 +2,10 @@ import Foundation
 import SwiftSyntax
 import SwiftParser
 
-struct CapacitorPluginMethod {
+struct CapacitorPluginMethodSyntax {
     let methodName: String
     let returnType: CapacitorPluginReturnType
-
+    
     private let nameIdent = TokenSyntax.identifier("name")
     private let returnTypeIdent = TokenSyntax.identifier("returnType")
     private let declRef = DeclReferenceExprSyntax(baseName: .identifier("CAPPluginMethod"))

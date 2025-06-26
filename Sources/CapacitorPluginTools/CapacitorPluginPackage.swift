@@ -1,11 +1,6 @@
-//
-//  File.swift
-//  
-//
-//  Created by Mark Anderson on 10/16/23.
-//
-
 import Foundation
+import CapacitorPluginSyntaxTools
+import JavascriptPackageTools
 
 enum CapacitorPluginError: Error {
     case objcFileCount(Int)
@@ -24,18 +19,22 @@ enum CapacitorPluginError: Error {
     }
 }
 
-class CapacitorPluginPackage {
-    let pluginDirectoryName: String
-    let basePathURL: URL
-    let packageJSONURL: URL
-    let pluginSrcDirectoryURL: URL
-    let iosSrcDirectoryURL: URL
-    let files: [URL]
+public class CapacitorPluginPackage {
+    public let pluginDirectoryName: String
+    public let basePathURL: URL
+    public let packageJSONURL: URL
+    public let pluginSrcDirectoryURL: URL
+    public let iosSrcDirectoryURL: URL
+    public let files: [URL]
 
-    var oldPlugin: OldPlugin?
+    private var oldPlugin: OldPlugin?
     private var packageJSONParser: PackageJSONParser
+    
+    public var plugin: CapacitorPlugin? {
+        oldPlugin?.capacitorPlugin
+    }
 
-    init(directoryName: String) throws {
+    public init(directoryName: String) throws {
         pluginDirectoryName = directoryName
 
         let fileManager = FileManager.default
@@ -53,7 +52,7 @@ class CapacitorPluginPackage {
         files = try fileManager.contentsOfDirectory(at: pluginSrcDirectoryURL, includingPropertiesForKeys: nil)
     }
 
-    func findObjCPluginFile() throws -> URL {
+    public func findObjCPluginFile() throws -> URL {
         let mfiles = files.filter { $0.absoluteString.hasSuffix(".m") }
 
         guard mfiles.count == 1, let url = mfiles.first else { throw CapacitorPluginError.objcFileCount(mfiles.count) }
@@ -63,18 +62,18 @@ class CapacitorPluginPackage {
         return url
     }
 
-    func parseObjCPluginFile(at url: URL) throws {
+    public func parseObjCPluginFile(at url: URL) throws {
         oldPlugin = try OldPlugin(at: url)
     }
 
-    func findObjCHeaderFile() throws -> URL {
+    public func findObjCHeaderFile() throws -> URL {
         let headerFiles = files.filter { $0.absoluteString.hasSuffix(".h") }
         guard headerFiles.count == 1, let url = headerFiles.first else { throw CapacitorPluginError.objcFileCount(headerFiles.count) }
 
         return url
     }
 
-    func findSwiftPluginFile() throws -> URL {
+    public func findSwiftPluginFile() throws -> URL {
         guard let oldPlugin else { throw CapacitorPluginError.oldPluginMissing }
 
         let fileName = "\(oldPlugin.capacitorPlugin.identifier).swift"
@@ -82,7 +81,7 @@ class CapacitorPluginPackage {
         return URL(filePath: fileName, directoryHint: .notDirectory, relativeTo: pluginSrcDirectoryURL)
     }
 
-    func findPodspecFile() throws -> URL {
+    public func findPodspecFile() throws -> URL {
         let fileName = packageJSONParser.podspec
 
         return URL(filePath: fileName, directoryHint: .notDirectory, relativeTo: basePathURL)

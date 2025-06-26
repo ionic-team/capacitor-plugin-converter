@@ -4,24 +4,24 @@ enum PackageJSONError: Error {
     case noPodspec
 }
 
-struct PackageJSONParser: CustomDebugStringConvertible {
+public struct PackageJSONParser: CustomDebugStringConvertible {
     private let package: PackageJSON
 
-    var npmName: String {
+    public var npmName: String {
         package.name
     }
 
-    var version: String {
+    public var version: String {
         package.version
     }
 
-    var podspec: String = ""
+    public var podspec: String = ""
 
-    var iosSrcDirectory: String {
+    public var iosSrcDirectory: String {
         package.capacitor.ios.src
     }
 
-    var pluginDirectories: [String] {
+    public var pluginDirectories: [String] {
         var plugins: [String] = []
 
         for file in package.files {
@@ -32,23 +32,18 @@ struct PackageJSONParser: CustomDebugStringConvertible {
 
         return plugins
     }
+    
+    public var scripts: [String: String] {
+        package.scripts
+    }
 
-    init(with url: URL) throws {
+    public init(with url: URL) throws {
         let data = try Data(contentsOf: url)
         package = try JSONDecoder().decode(PackageJSON.self, from: data)
         podspec = try findPodspec()
     }
-
-    private func findPodspec() throws -> String {
-        for file in package.files {
-            if file.hasSuffix("podspec") {
-                return file
-            }
-        }
-        throw PackageJSONError.noPodspec
-    }
-
-    var debugDescription: String {
+    
+    public var debugDescription: String {
         """
         NPM Name: \(npmName)
         Version: \(version)
@@ -56,5 +51,14 @@ struct PackageJSONParser: CustomDebugStringConvertible {
         iOS Sources: \(iosSrcDirectory)
         Plugin Directories: \(pluginDirectories)
         """
+    }
+    
+    private func findPodspec() throws -> String {
+        for file in package.files {
+            if file.hasSuffix("podspec") {
+                return file
+            }
+        }
+        throw PackageJSONError.noPodspec
     }
 }
