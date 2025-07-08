@@ -1,13 +1,14 @@
 import Foundation
 import RegexBuilder
+import CapacitorPluginSyntaxTools
 
 enum OldPluginParserError: Error {
     case pluginMissing
     case podspecNameMissing
 }
 
-class OldPlugin {
-    var capacitorPlugin: CapacitorPluginSyntax
+package class OldPlugin {
+    var capacitorPlugin: CapacitorPlugin
 
     init(at fileURL: URL) throws {
         let pluginSourceText = try String(contentsOf: fileURL, encoding: .utf8)
@@ -15,7 +16,7 @@ class OldPlugin {
         try matchMethods(text: pluginSourceText)
     }
 
-    private static func matchPlugin(text: String) throws -> CapacitorPluginSyntax {
+    private static func matchPlugin(text: String) throws -> CapacitorPlugin {
         let identiferRef = Reference(Substring.self)
         let jsNameRef = Reference(Substring.self)
 
@@ -38,7 +39,7 @@ class OldPlugin {
         }
 
         if let match = text.firstMatch(of: pluginNameRegex) {
-            return CapacitorPluginSyntax(identifier: String(match[identiferRef]), jsName: String(match[jsNameRef]))
+            return CapacitorPlugin(identifier: String(match[identiferRef]), jsName: String(match[jsNameRef]))
         } else {
             throw OldPluginParserError.pluginMissing
         }

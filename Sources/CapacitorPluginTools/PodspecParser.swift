@@ -1,10 +1,10 @@
 import Foundation
 import RegexBuilder
 
-struct PodspecParser {
-    let podName: String
+public struct PodspecParser {
+    public let podName: String
 
-    init(at fileURL: URL) throws {
+    public init(at fileURL: URL) throws {
         let pluginSourceText = try String(contentsOf: fileURL, encoding: .utf8)
         podName = try PodspecParser.podnameMatcher(text: pluginSourceText)
     }
