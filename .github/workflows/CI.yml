@@ -14,7 +14,7 @@ permissions:
 jobs:
     test:
         name: Run Tests
-        runs-on: macos-latest
+        runs-on: macos-15
         steps:
             - uses: actions/checkout@v4
             - uses: swift-actions/setup-swift@v2
