@@ -55,6 +55,8 @@ struct Cap2SPM: ParsableCommand {
         }
         unneededFiles.append(contentsOf: oldFiles)
         
+        try capacitorPluginPackage.updatePackageJSON()
+        
         try deleteFiles(at: unneededFiles, shouldBackup: shouldBackup)
 
         try modifyGitignores(for: capacitorPluginPackage)

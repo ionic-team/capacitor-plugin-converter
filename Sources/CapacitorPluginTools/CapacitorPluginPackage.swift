@@ -2,12 +2,12 @@ import Foundation
 import CapacitorPluginSyntaxTools
 import JavascriptPackageTools
 
-enum CapacitorPluginError: Error {
+public enum CapacitorPluginError: Error {
     case objcFileCount(Int)
     case objcHeaderCount(Int)
     case oldPluginMissing
 
-    var message: String {
+    public var message: String {
         switch self {
         case .objcFileCount(let numberOfFiles):
             return "Found \(numberOfFiles) Objective-C *.m files, expected \(numberOfFiles)"
@@ -73,8 +73,8 @@ public class CapacitorPluginPackage {
         return url
     }
 
-    public func findSwiftPluginFile() throws -> URL {
-        guard let oldPlugin else { throw CapacitorPluginError.oldPluginMissing }
+    public func findSwiftPluginFile() throws(CapacitorPluginError)  -> URL {
+        guard let oldPlugin else { throw .oldPluginMissing }
 
         let fileName = "\(oldPlugin.capacitorPlugin.identifier).swift"
 
@@ -85,5 +85,22 @@ public class CapacitorPluginPackage {
         let fileName = packageJSONParser.podspec
 
         return URL(filePath: fileName, directoryHint: .notDirectory, relativeTo: basePathURL)
+    }
+    
+    public func updatePackageJSON() throws {
+        guard let oldPlugin else { throw CapacitorPluginError.oldPluginMissing }
+        
+        try packageJSONParser.changeScript(named: "verify:ios",
+                                           to: "xcodebuild -scheme \(oldPlugin.capacitorPlugin.identifier) -destination generic/platform=iOS")
+        
+        var newFiles = packageJSONParser.files
+        newFiles.removeAll(where: { $0 == "ios/Plugin"})
+        newFiles.append("ios/Sources")
+        newFiles.append("ios/Tests")
+        newFiles.append("Package.swift")
+        
+        packageJSONParser.files = newFiles
+        
+        try packageJSONParser.writePackageJSON()
     }
 }
