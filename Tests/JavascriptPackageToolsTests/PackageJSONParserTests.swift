@@ -6,7 +6,7 @@ struct PackageJSONParserTests {
     let packageJSONParser: PackageJSONParser
     
     init() throws {
-        let testJSON = try #require(Bundle.module.url(forResource: "package-test", withExtension: "json"))
+        let testJSON = try #require(Bundle.module.url(forResource: "package-new", withExtension: "json"))
         packageJSONParser = try PackageJSONParser(with: testJSON)
     }
     

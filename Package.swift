@@ -48,7 +48,7 @@ let package = Package(
                     dependencies: [
                         .target(name: "JavascriptPackageTools"),
                     ],
-                    resources: [.copy("package-test.json")]
+                    resources: [.copy("../Resources/package-new.json")]
         ),
         .testTarget(name: "CapacitorPluginSyntaxToolsTests",
                 dependencies: [

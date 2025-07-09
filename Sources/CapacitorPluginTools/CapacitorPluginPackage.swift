@@ -6,6 +6,7 @@ public enum CapacitorPluginError: Error {
     case objcFileCount(Int)
     case objcHeaderCount(Int)
     case oldPluginMissing
+    case updatePackageJSONFailure
 
     public var message: String {
         switch self {
@@ -15,6 +16,8 @@ public enum CapacitorPluginError: Error {
             return "Can't find OldPlugin"
         case .objcHeaderCount(let numberOfFiles):
             return "Found \(numberOfFiles) Objective-C Header files, expected \(numberOfFiles)"
+        case .updatePackageJSONFailure:
+            return "Writing a new package.json failed as the old plugin name could not be found."
         }
     }
 }
@@ -90,13 +93,18 @@ public class CapacitorPluginPackage {
     public func updatePackageJSON() throws {
         guard let oldPlugin else { throw CapacitorPluginError.oldPluginMissing }
         
-        try packageJSONParser.changeScript(named: "verify:ios",
+        try? packageJSONParser.changeScript(named: "verify:ios",
                                            to: "xcodebuild -scheme \(oldPlugin.capacitorPlugin.identifier) -destination generic/platform=iOS")
         
         var newFiles = packageJSONParser.files
-        newFiles.removeAll(where: { $0 == "ios/Plugin"})
-        newFiles.append("ios/Sources")
-        newFiles.append("ios/Tests")
+        
+        newFiles.removeAll(where: { $0 == "ios/Plugin" || $0 == "ios/Plugin/" })
+        
+        if newFiles.contains(where: { $0 != "ios/"}) {
+            newFiles.append("ios/Sources")
+            newFiles.append("ios/Tests")
+        }
+        
         newFiles.append("Package.swift")
         
         packageJSONParser.files = newFiles

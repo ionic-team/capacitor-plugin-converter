@@ -5,6 +5,7 @@ public enum PackageJSONError: Error {
     case noPodspec
     case scriptEntryNotFound
     case fileEntryNotFound
+    case jsonStringGenerationFailed
 }
 
 public struct PackageJSONParser: CustomDebugStringConvertible {
@@ -70,7 +71,10 @@ public struct PackageJSONParser: CustomDebugStringConvertible {
     }
     
     public func writePackageJSON() throws {
-        let data = try json.rawData()
+        guard let data = jsonString?.data(using: .utf8) else {
+            throw PackageJSONError.jsonStringGenerationFailed
+        }
+        
         try data.write(to: jsonURL)
     }
     
