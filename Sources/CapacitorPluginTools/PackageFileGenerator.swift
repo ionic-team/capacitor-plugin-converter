@@ -2,7 +2,7 @@ import Foundation
 
 public class PackageFileGenerator {
     let packageName: String
-    let libName: String
+    let targetName: String
     let capRepoName = "capacitor-swift-pm"
     let capLocation = "https://github.com/ionic-team/capacitor-swift-pm.git"
     let capVersion = "7.0.0"
@@ -17,32 +17,32 @@ public class PackageFileGenerator {
                 platforms: [.iOS(.v14)],
                 products: [
                     .library(
-                        name: "\(libName)",
-                        targets: ["\(libName)"])
+                        name: "\(packageName)",
+                        targets: ["\(targetName)"])
                 ],
                 dependencies: [
                     .package(url: "\(capLocation)", from: "\(capVersion)")
                 ],
                 targets: [
                     .target(
-                        name: "\(libName)",
+                        name: "\(targetName)",
                         dependencies: [
                             .product(name: "Capacitor", package: "\(capRepoName)"),
                             .product(name: "Cordova", package: "\(capRepoName)")
                         ],
-                        path: "ios/Sources/\(libName)"),
+                        path: "ios/Sources/\(targetName)"),
                     .testTarget(
-                        name: "\(libName)Tests",
-                        dependencies: ["\(libName)"],
-                        path: "ios/Tests/\(libName)Tests")
+                        name: "\(targetName)Tests",
+                        dependencies: ["\(targetName)"],
+                        path: "ios/Tests/\(targetName)Tests")
                 ]
             )
             """
     }
 
-    public init(packageName: String, libName: String) {
+    public init(packageName: String, targetName: String) {
         self.packageName = packageName
-        self.libName = libName
+        self.targetName = targetName
     }
     
     public func generateFile(at fileURL: URL) throws {
