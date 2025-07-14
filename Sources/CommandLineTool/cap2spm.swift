@@ -41,7 +41,7 @@ struct Cap2SPM: ParsableCommand {
         
         try capPlugin.modifySwiftFile(at: swiftFileURL)
         
-        let packageGenerator = PackageFileGenerator(packageName: podspec.podName, libName: capPlugin.identifier)
+        let packageGenerator = PackageFileGenerator(packageName: podspec.podName, targetName: capPlugin.identifier)
         
         try packageGenerator.generateFile(at: podspecFileURL)
         
