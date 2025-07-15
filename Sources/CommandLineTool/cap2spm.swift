@@ -59,6 +59,8 @@ struct Cap2SPM: ParsableCommand {
 
         try modifyGitignores(for: capacitorPluginPackage)
         
+        try moveSourceDirectories(for: capacitorPluginPackage)
+        
         try capacitorPluginPackage.updatePackageJSON()
     }
 }
