@@ -58,5 +58,6 @@ struct Cap2SPM: ParsableCommand {
         try deleteFiles(at: unneededFiles, shouldBackup: shouldBackup)
 
         try modifyGitignores(for: capacitorPluginPackage)
+        try moveSourceDirectories(for: capacitorPluginPackage)
     }
 }
