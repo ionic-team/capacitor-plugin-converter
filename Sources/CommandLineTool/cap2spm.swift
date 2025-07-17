@@ -61,6 +61,6 @@ struct Cap2SPM: ParsableCommand {
         
         try moveSourceDirectories(for: capacitorPluginPackage)
         
-        try capacitorPluginPackage.updatePackageJSON()
+        try capacitorPluginPackage.updatePackageJSON(for: podspec.podName)
     }
 }

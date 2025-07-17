@@ -90,11 +90,9 @@ public class CapacitorPluginPackage {
         return URL(filePath: fileName, directoryHint: .notDirectory, relativeTo: basePathURL)
     }
     
-    public func updatePackageJSON() throws {
-        guard let oldPlugin else { throw CapacitorPluginError.oldPluginMissing }
-        
+    public func updatePackageJSON(for podName: String) throws {
         try? packageJSONParser.changeScript(named: "verify:ios",
-                                           to: "xcodebuild -scheme \(oldPlugin.capacitorPlugin.identifier) -destination generic/platform=iOS")
+                                           to: "xcodebuild -scheme \(podName) -destination generic/platform=iOS")
         
         var newFiles = packageJSONParser.files
         
