@@ -6,7 +6,6 @@ public enum CapacitorPluginError: Error {
     case objcFileCount(Int)
     case objcHeaderCount(Int)
     case oldPluginMissing
-    case updatePackageJSONFailure
 
     public var message: String {
         switch self {
@@ -16,8 +15,6 @@ public enum CapacitorPluginError: Error {
             return "Can't find OldPlugin"
         case .objcHeaderCount(let numberOfFiles):
             return "Found \(numberOfFiles) Objective-C Header files, expected \(numberOfFiles)"
-        case .updatePackageJSONFailure:
-            return "Writing a new package.json failed as the old plugin name could not be found."
         }
     }
 }
