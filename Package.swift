@@ -9,6 +9,7 @@ let package = Package(
     dependencies: [
         .package(url: "https://github.com/apple/swift-argument-parser.git", from: "1.5.1"),
         .package(url: "https://github.com/apple/swift-syntax.git", from: "601.0.1"),
+        .package(url: "https://github.com/SwiftyJSON/SwiftyJSON.git", from: "5.0.0"),
     ],
     targets: [
         .executableTarget(
@@ -36,14 +37,18 @@ let package = Package(
                     .target(name: "JavascriptPackageTools")
                 ]
         ),
-        .target(name: "JavascriptPackageTools"),
+        .target(name: "JavascriptPackageTools",
+                dependencies: [
+                    .product(name: "SwiftyJSON", package: "SwiftyJSON")
+                ]
+        ),
         
         // Test Targets
         .testTarget(name: "JavascriptPackageToolsTests",
                     dependencies: [
                         .target(name: "JavascriptPackageTools"),
                     ],
-                    resources: [.copy("package-test.json")]
+                    resources: [.copy("../Resources/package-new.json")]
         ),
         .testTarget(name: "CapacitorPluginSyntaxToolsTests",
                 dependencies: [

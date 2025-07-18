@@ -1,18 +1,33 @@
 import Foundation
+import SwiftyJSON
 
-enum PackageJSONError: Error {
+public enum PackageJSONError: Error {
     case noPodspec
+    case scriptEntryNotFound
+    case fileEntryNotFound
+    case jsonStringGenerationFailed
 }
 
 public struct PackageJSONParser: CustomDebugStringConvertible {
     private let package: PackageJSON
-
+    private var json: JSON
+    private let jsonURL: URL
+    
     public var npmName: String {
         package.name
     }
 
     public var version: String {
         package.version
+    }
+    
+    public var files: [String] {
+        get {
+            package.files
+        }
+        set {
+            json["files"] = JSON(newValue)
+        }
     }
 
     public var podspec: String = ""
@@ -33,14 +48,34 @@ public struct PackageJSONParser: CustomDebugStringConvertible {
         return plugins
     }
     
-    public var scripts: [String: String] {
-        package.scripts
+    public var jsonString: String? {
+        json.rawString(.utf8, options: [.withoutEscapingSlashes, .prettyPrinted])
     }
 
     public init(with url: URL) throws {
+        jsonURL = url
+        
         let data = try Data(contentsOf: url)
+        json = try JSON(data: data)
+        
         package = try JSONDecoder().decode(PackageJSON.self, from: data)
         podspec = try findPodspec()
+    }
+    
+    public mutating func changeScript(named: String, to runString: String) throws(PackageJSONError) {
+        if json["scripts"][named] != JSON.null {
+            json["scripts"][named] = JSON(runString)
+        } else {
+            throw .scriptEntryNotFound
+        }
+    }
+    
+    public func writePackageJSON() throws {
+        guard let data = jsonString?.data(using: .utf8) else {
+            throw PackageJSONError.jsonStringGenerationFailed
+        }
+        
+        try data.write(to: jsonURL)
     }
     
     public var debugDescription: String {
@@ -53,12 +88,12 @@ public struct PackageJSONParser: CustomDebugStringConvertible {
         """
     }
     
-    private func findPodspec() throws -> String {
+    private func findPodspec() throws(PackageJSONError) -> String {
         for file in package.files {
             if file.hasSuffix("podspec") {
                 return file
             }
         }
-        throw PackageJSONError.noPodspec
+        throw .noPodspec
     }
 }
