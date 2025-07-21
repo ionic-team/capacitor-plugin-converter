@@ -95,7 +95,7 @@ public class CapacitorPluginPackage {
         
         newFiles.removeAll(where: { $0 == "ios/Plugin" || $0 == "ios/Plugin/" })
         
-        if newFiles.contains(where: { $0 != "ios/"}) {
+        if !newFiles.contains(where: { $0 == "ios/"}) {
             newFiles.append("ios/Sources")
             newFiles.append("ios/Tests")
         }
