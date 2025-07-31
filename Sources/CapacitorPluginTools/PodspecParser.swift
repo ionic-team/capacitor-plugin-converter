@@ -30,4 +30,10 @@ public struct PodspecParser {
             throw OldPluginParserError.podspecNameMissing
         }
     }
+
+    public func modifyPodspecFile(at fileURL: URL) throws {
+        var podspecText = try String(contentsOf: fileURL, encoding: .utf8)
+        podspecText = podspecText.replacingOccurrences(of: "/Plugin/", with: "/Sources/")
+        try podspecText.write(to: fileURL, atomically: true, encoding: .utf8)
+    }
 }

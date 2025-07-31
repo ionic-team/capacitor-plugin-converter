@@ -44,7 +44,9 @@ struct Cap2SPM: ParsableCommand {
         let packageGenerator = PackageFileGenerator(packageName: podspec.podName, targetName: capPlugin.identifier)
         
         try packageGenerator.generateFile(at: podspecFileURL)
-        
+
+        try podspec.modifyPodspecFile(at: podspecFileURL)
+
         var unneededFiles = [hFileURL, mFileURL]
         let oldFiles = ["Plugin/Info.plist",
                         "PluginTests/Info.plist",
