@@ -5,16 +5,16 @@ public class PackageFileGenerator {
     let targetName: String
     let capRepoName = "capacitor-swift-pm"
     let capLocation = "https://github.com/ionic-team/capacitor-swift-pm.git"
-    let capVersion = "7.0.0"
+    let capVersion = "8.0.0"
 
     var packageText: String {
         return """
-            // swift-tools-version: 5.9
+            // swift-tools-version: 6.1
             import PackageDescription
 
             let package = Package(
                 name: "\(packageName)",
-                platforms: [.iOS(.v14)],
+                platforms: [.iOS(.v15)],
                 products: [
                     .library(
                         name: "\(packageName)",
