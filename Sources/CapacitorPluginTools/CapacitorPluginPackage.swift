@@ -96,7 +96,7 @@ public class CapacitorPluginPackage {
         if (try? fileURL.checkResourceIsReachable()) == true {
             return fileURL
         } else {
-            print("Warning: file \(fileURL) not found, trying Plugin.swift")
+            print("Warning: file \(fileURL.path()) not found, trying Plugin.swift")
         }
 
         let backupFileURL = URL(filePath: "Plugin.swift",
