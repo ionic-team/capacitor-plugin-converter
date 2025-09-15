@@ -6,7 +6,7 @@ extension Cap2SPM {
         if shouldBackup {
             try fileBackup(of: fileList)
         } else {
-            try fileDelete(of: fileList)
+            fileDelete(of: fileList)
         }
     }
     
@@ -15,9 +15,13 @@ extension Cap2SPM {
         
         try moveItemCreatingIntermediaryDirectories(at: package.iosSrcDirectoryURL.appending(path: "Plugin"),
                                                     to: package.iosSrcDirectoryURL.appending(path: "Sources").appending(path: identifer))
-        
-        try moveItemCreatingIntermediaryDirectories(at: package.iosSrcDirectoryURL.appending(path: "PluginTests"),
-                                                    to: package.iosSrcDirectoryURL.appending(path: "Tests").appending(path: "\(identifer)Tests"))
+
+        do {
+            try moveItemCreatingIntermediaryDirectories(at: package.iosSrcDirectoryURL.appending(path: "PluginTests"),
+                                                        to: package.iosSrcDirectoryURL.appending(path: "Tests").appending(path: "\(identifer)Tests"))
+        } catch {
+            print("Warning: can't move PluginTests, as directory was not found")
+        }
     }
 
     func moveItemCreatingIntermediaryDirectories(at: URL, to: URL) throws {
@@ -37,10 +41,15 @@ extension Cap2SPM {
         }
     }
 
-    func fileDelete(of fileURLs: [URL]) throws {
+    func fileDelete(of fileURLs: [URL]) {
         for fileURL in fileURLs {
             print("Deleting \(fileURL.path())...")
-            try FileManager.default.removeItem(at: fileURL)
+            do {
+                try FileManager.default.removeItem(at: fileURL)
+            } catch {
+                print("Warning: Deleting \(fileURL.path()) failed.")
+            }
+
         }
     }
 

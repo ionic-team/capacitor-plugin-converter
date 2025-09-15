@@ -6,6 +6,7 @@ public enum CapacitorPluginError: Error {
     case objcFileCount(Int)
     case objcHeaderCount(Int)
     case oldPluginMissing
+    case cantFindPluginSwift(String)
 
     public var message: String {
         switch self {
@@ -15,6 +16,8 @@ public enum CapacitorPluginError: Error {
             return "Can't find OldPlugin"
         case .objcHeaderCount(let numberOfFiles):
             return "Found \(numberOfFiles) Objective-C Header files, expected \(numberOfFiles)"
+        case .cantFindPluginSwift(let name):
+            return "Can't find \(name) or Plugin.swift in directory"
         }
     }
 }
@@ -73,12 +76,30 @@ public class CapacitorPluginPackage {
         return url
     }
 
-    public func findSwiftPluginFile() throws(CapacitorPluginError)  -> URL {
+    public func findSwiftPluginFile() throws(CapacitorPluginError) -> URL {
         guard let oldPlugin else { throw .oldPluginMissing }
 
         let fileName = "\(oldPlugin.capacitorPlugin.identifier).swift"
 
-        return URL(filePath: fileName, directoryHint: .notDirectory, relativeTo: pluginSrcDirectoryURL)
+        let fileURL = URL(filePath: fileName,
+                          directoryHint: .notDirectory,
+                          relativeTo: pluginSrcDirectoryURL)
+
+        if (try? fileURL.checkResourceIsReachable()) == true {
+            return fileURL
+        } else {
+            print("Warning: file \(fileURL.path()) not found, trying Plugin.swift")
+        }
+
+        let backupFileURL = URL(filePath: "Plugin.swift",
+                                directoryHint: .notDirectory,
+                                relativeTo: pluginSrcDirectoryURL)
+
+        if (try? backupFileURL.checkResourceIsReachable()) == true {
+            return backupFileURL
+        }
+
+        throw .cantFindPluginSwift(fileName)
     }
 
     public func findPodspecFile() throws -> URL {
