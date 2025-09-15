@@ -15,7 +15,7 @@ class AddPluginToClass: SyntaxRewriter {
             return DeclSyntax(node)
         }
 
-        if let inheritedType = inheritedTypes.first(where: { $0.isNamed("CAPPlugin") }) {
+        if inheritedTypes.first(where: { $0.isNamed("CAPPlugin") }) != nil {
             var newNode = capacitorPluginSyntax.addBridgedPluginConformance(node)
             newNode.memberBlock.members.insert(contentsOf: capacitorPluginSyntax.createMemberBlock(),
                                                at: node.memberBlock.members.startIndex)
