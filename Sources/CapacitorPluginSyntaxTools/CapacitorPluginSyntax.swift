@@ -69,7 +69,7 @@ struct CapacitorPluginSyntax {
                                                  modifiers: DeclModifierListSyntax(arrayLiteral: declPublicModifier),
                                                  bindingSpecifier: .keyword(.let),
                                                  bindings: PatternBindingListSyntax(arrayLiteral: patternBinding),
-                                                 trailingTrivia: .space)
+                                                 trailingTrivia: .none)
 
         return indentifierDecl
     }
@@ -109,7 +109,7 @@ struct CapacitorPluginSyntax {
                                                  modifiers: DeclModifierListSyntax(arrayLiteral: declPublicModifier),
                                                  bindingSpecifier: .keyword(.let),
                                                  bindings: PatternBindingListSyntax(arrayLiteral: patternBinding),
-                                                 trailingTrivia: .space)
+                                                 trailingTrivia: .none)
 
         return indentifierDecl
     }
