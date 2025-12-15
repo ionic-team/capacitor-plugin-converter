@@ -110,6 +110,25 @@ public class CapacitorPluginPackage {
         throw .cantFindPluginSwift(fileName)
     }
 
+    public func findSwiftTestsPluginFile() -> URL? {
+        if let oldPlugin {
+            let fileName = "\(oldPlugin.capacitorPlugin.identifier)Tests.swift"
+            let fileURL = iosSrcDirectoryURL.appending(path: "PluginTests").appending(path: fileName)
+            if (try? fileURL.checkResourceIsReachable()) == true {
+                return fileURL
+            } else {
+                print("Warning: file \(fileURL.path()) not found, trying PluginTests.swift")
+            }
+
+            let backupFileURL = iosSrcDirectoryURL.appending(path: "PluginTests").appending(path: "PluginTests.swift")
+
+            if (try? backupFileURL.checkResourceIsReachable()) == true {
+                return backupFileURL
+            }
+        }
+        return nil
+    }
+
     public func findPodspecFile() throws -> URL {
         let fileName = packageJSONParser.podspec
 
