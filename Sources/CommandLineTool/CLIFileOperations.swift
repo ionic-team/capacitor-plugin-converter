@@ -91,10 +91,7 @@ extension Cap2SPM {
     }
 
     func modifyTestsFile(at fileURL: URL, with target: String) throws {
-        var testsText = ""
-        if FileManager.default.fileExists(atPath: fileURL.path()) {
-            testsText = try String(contentsOf: fileURL, encoding: .utf8)
-        }
+        var testsText = try String(contentsOf: fileURL, encoding: .utf8)
         testsText.replace("@testable import Plugin\n", with: "@testable import \(target)\n")
         try testsText.write(to: fileURL, atomically: true, encoding: .utf8)
     }
