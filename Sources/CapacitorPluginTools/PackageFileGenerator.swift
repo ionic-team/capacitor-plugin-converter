@@ -5,7 +5,7 @@ public class PackageFileGenerator {
     let targetName: String
     let capRepoName = "capacitor-swift-pm"
     let capLocation = "https://github.com/ionic-team/capacitor-swift-pm.git"
-    let capVersion = "7.0.0"
+    let capVersion = "8.0.0"
 
     var packageText: String {
         return """
