@@ -27,6 +27,8 @@ OPTIONS:
   --objc-file <objc-file> Objective-C file containing CAP_PLUGIN macro
   --swift-file <swift-file>
                           Swift file containing class inheriting from CAPPlugin
+  --swift-tests-file <swift-tests-file>
+                          Swift file containing plugin tests
   -h, --help              Show help information.
 ```
 

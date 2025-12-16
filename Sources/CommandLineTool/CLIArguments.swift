@@ -5,10 +5,12 @@ extension Cap2SPM {
     func getUrlsForArgs(package: CapacitorPluginPackage,
                         objcHeader: String?,
                         objcFile: String?,
-                        swiftFile: String?) throws -> (URL, URL, URL) {
+                        swiftFile: String?,
+                        swiftTestsFile: String?) throws -> (URL, URL, URL, URL?) {
 
         let mFileURL: URL
         let swiftFileURL: URL
+        let swiftTestsFileURL: URL?
         let hFileURL: URL
         
         if let objcHeader {
@@ -30,6 +32,12 @@ extension Cap2SPM {
             swiftFileURL = try package.findSwiftPluginFile()
         }
         
-        return (mFileURL, swiftFileURL, hFileURL)
+        if let swiftTestsFile {
+            swiftTestsFileURL = URL(filePath: swiftTestsFile, directoryHint: .notDirectory)
+        } else {
+            swiftTestsFileURL = package.findSwiftTestsPluginFile()
+        }
+
+        return (mFileURL, swiftFileURL, hFileURL, swiftTestsFileURL)
     }
 }

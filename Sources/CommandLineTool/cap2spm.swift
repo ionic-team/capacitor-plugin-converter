@@ -18,20 +18,25 @@ struct Cap2SPM: ParsableCommand {
     @Option(help: "Swift file containing class inheriting from CAPPlugin")
     var swiftFile: String?
     
+    @Option(help: "Swift file containing plugin tests")
+    var swiftTestsFile: String?
+
     @Argument(help: "Plugin Directory")
     var pluginDirectory: String
     
     mutating func run() throws {
         let mFileURL: URL
         let swiftFileURL: URL
+        let swiftTestsFileURL: URL?
         let hFileURL: URL
         
         let capacitorPluginPackage = try CapacitorPluginPackage(directoryName: pluginDirectory)
         
-        (mFileURL, swiftFileURL, hFileURL) = try getUrlsForArgs(package: capacitorPluginPackage,
+        (mFileURL, swiftFileURL, hFileURL, swiftTestsFileURL) = try getUrlsForArgs(package: capacitorPluginPackage,
                                                                 objcHeader: objcHeader,
                                                                 objcFile: objcFile,
-                                                                swiftFile: swiftFile)
+                                                                swiftFile: swiftFile,
+                                                                swiftTestsFile: swiftTestsFile)
         
         
         let podspecFileURL = try capacitorPluginPackage.findPodspecFile()
@@ -41,6 +46,10 @@ struct Cap2SPM: ParsableCommand {
         
         try capPlugin.modifySwiftFile(at: swiftFileURL)
         
+        if let swiftTestsFileURL {
+            try? modifyTestsFile(at: swiftTestsFileURL, with: capPlugin.identifier)
+        }
+
         let packageGenerator = PackageFileGenerator(packageName: podspec.podName, targetName: capPlugin.identifier)
         
         try packageGenerator.generateFile(at: podspecFileURL)

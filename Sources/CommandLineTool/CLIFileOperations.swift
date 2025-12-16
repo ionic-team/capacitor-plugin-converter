@@ -89,4 +89,10 @@ extension Cap2SPM {
         }
         try gitignoreText.write(to: fileURL, atomically: true, encoding: .utf8)
     }
+
+    func modifyTestsFile(at fileURL: URL, with target: String) throws {
+        var testsText = try String(contentsOf: fileURL, encoding: .utf8)
+        testsText.replace("@testable import Plugin\n", with: "@testable import \(target)\n")
+        try testsText.write(to: fileURL, atomically: true, encoding: .utf8)
+    }
 }
