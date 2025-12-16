@@ -1,7 +1,7 @@
 # Capacitor Plugin Converter
 
 > [!IMPORTANT]
-> This is a *experimental* CLI tool under heavy development
+> Tool is still under heavy development, it works for many (probably most) cases but be sure to have a good checkin in source control or a backup before using.
 
 This package builds a binary cap2spm that allows for the following:
 
