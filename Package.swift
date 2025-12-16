@@ -7,7 +7,7 @@ let package = Package(
     name: "capacitor-plugin-converter",
     platforms: [.macOS(.v15)],
     dependencies: [
-        .package(url: "https://github.com/apple/swift-argument-parser.git", from: "1.5.1"),
+        .package(url: "https://github.com/apple/swift-argument-parser.git", from: "1.6.2"),
         .package(url: "https://github.com/apple/swift-syntax.git", from: "601.0.1"),
         .package(url: "https://github.com/SwiftyJSON/SwiftyJSON.git", from: "5.0.0"),
     ],
