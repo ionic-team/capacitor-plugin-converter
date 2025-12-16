@@ -1,7 +1,8 @@
 # Capacitor Plugin Converter
 
 > [!IMPORTANT]
-> Tool is still under heavy development, it works for many (probably most) cases but be sure to have a good checkin in source control or a backup before using.
+> This tool is still under heavy development, it works for many (probably most) cases,
+> but be sure to have known good checkin in source control or a backup before using.
 
 This package builds a binary cap2spm that allows for the following:
 
