@@ -9,9 +9,9 @@ public class PackageFileGenerator {
     let capVersion = "8.0.0"
 
     var packageText: String {
-        var hasTestsText = ""
+        var testTargetText = ""
         if hasTests {
-            hasTestsText = """
+            testTargetText = """
             ,
                     .testTarget(
                         name: "\(targetName)Tests",
@@ -41,7 +41,7 @@ public class PackageFileGenerator {
                             .product(name: "Capacitor", package: "\(capRepoName)"),
                             .product(name: "Cordova", package: "\(capRepoName)")
                         ],
-                        path: "ios/Sources/\(targetName)")\(hasTestsText)
+                        path: "ios/Sources/\(targetName)")\(testTargetText)
                 ]
             )
             """
