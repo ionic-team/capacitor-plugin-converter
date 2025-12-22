@@ -6,7 +6,7 @@ struct PackageFileGeneratorTests {
     let packageFileGenerator: PackageFileGenerator
     
     init() {
-        packageFileGenerator = PackageFileGenerator(packageName: "CapacitorAppPlugin", targetName: "AppPlugin")
+        packageFileGenerator = PackageFileGenerator(packageName: "CapacitorAppPlugin", targetName: "AppPlugin", hasTests: true)
     }
     
     @Test("Generates expected Package.swift Text")
