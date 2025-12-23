@@ -25,10 +25,10 @@ struct Cap2SPM: ParsableCommand {
     var pluginDirectory: String
     
     mutating func run() throws {
-        let mFileURL: URL
+        let mFileURL: URL?
         let swiftFileURL: URL
         let swiftTestsFileURL: URL?
-        let hFileURL: URL
+        let hFileURL: URL?
         
         let capacitorPluginPackage = try CapacitorPluginPackage(directoryName: pluginDirectory)
         
@@ -42,21 +42,29 @@ struct Cap2SPM: ParsableCommand {
         let podspecFileURL = try capacitorPluginPackage.findPodspecFile()
         let podspec = try PodspecParser(at: podspecFileURL)
         
-        guard let capPlugin = capacitorPluginPackage.plugin else { return }
+        guard let identifier = capacitorPluginPackage.identifier else { return }
         
-        try capPlugin.modifySwiftFile(at: swiftFileURL)
+        if let capPlugin = capacitorPluginPackage.plugin {
+            try capPlugin.modifySwiftFile(at: swiftFileURL)
+        }
         
         if let swiftTestsFileURL {
-            try? modifyTestsFile(at: swiftTestsFileURL, with: capPlugin.identifier)
+            try? modifyTestsFile(at: swiftTestsFileURL, with: identifier)
         }
 
-        let packageGenerator = PackageFileGenerator(packageName: podspec.podName, targetName: capPlugin.identifier, hasTests: swiftTestsFileURL != nil)
-        
+        let packageGenerator = PackageFileGenerator(packageName: podspec.podName, targetName: identifier, hasTests: swiftTestsFileURL != nil)
+
         try packageGenerator.generateFile(at: podspecFileURL)
 
         try podspec.modifyPodspecFile(at: podspecFileURL)
 
-        var unneededFiles = [hFileURL, mFileURL]
+        var unneededFiles: [URL] = []
+        if let hFileURL {
+            unneededFiles.append(hFileURL)
+        }
+        if let mFileURL {
+            unneededFiles.append(mFileURL)
+        }
         let oldFiles = ["Plugin/Info.plist",
                         "PluginTests/Info.plist",
                         "Plugin.xcodeproj",
