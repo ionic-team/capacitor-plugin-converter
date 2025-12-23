@@ -154,8 +154,6 @@ public class CapacitorPluginPackage {
     }
 
     public func setIdentifier(from fileURL: URL) throws {
-        if let value = try IdentifierExtractor.getIdentifier(from: fileURL) {
-            identifier = value
-        }
+        identifier = try IdentifierExtractor.getIdentifier(from: fileURL)
     }
 }
