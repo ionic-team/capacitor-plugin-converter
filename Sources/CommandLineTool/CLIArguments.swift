@@ -6,24 +6,27 @@ extension Cap2SPM {
                         objcHeader: String?,
                         objcFile: String?,
                         swiftFile: String?,
-                        swiftTestsFile: String?) throws -> (URL, URL, URL, URL?) {
+                        swiftTestsFile: String?) throws -> (URL?, URL, URL?, URL?) {
 
-        let mFileURL: URL
-        let swiftFileURL: URL
+        let mFileURL: URL?
+        var swiftFileURL: URL
         let swiftTestsFileURL: URL?
-        let hFileURL: URL
+        let hFileURL: URL?
         
         if let objcHeader {
             hFileURL = URL(filePath: objcHeader, directoryHint: .notDirectory)
         } else {
-            hFileURL = try package.findObjCHeaderFile()
+            hFileURL = package.findObjCHeaderFile()
         }
 
         if let objcFile {
             mFileURL = URL(filePath: objcFile, directoryHint: .notDirectory)
-            try package.parseObjCPluginFile(at: mFileURL)
         } else {
-            mFileURL = try package.findObjCPluginFile()
+            mFileURL = package.findObjCPluginFile()
+        }
+
+        if let mFileURL {
+            try package.parseObjCPluginFile(at: mFileURL)
         }
 
         if let swiftFile {
@@ -32,6 +35,10 @@ extension Cap2SPM {
             swiftFileURL = try package.findSwiftPluginFile()
         }
         
+        if mFileURL == nil && isSwiftFileUpdated(at: swiftFileURL) {
+            try? package.setIdentifier(from: swiftFileURL)
+        }
+
         if let swiftTestsFile {
             swiftTestsFileURL = URL(filePath: swiftTestsFile, directoryHint: .notDirectory)
         } else {
