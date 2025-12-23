@@ -9,7 +9,7 @@ extension Cap2SPM {
                         swiftTestsFile: String?) throws -> (URL?, URL, URL?, URL?) {
 
         let mFileURL: URL?
-        var swiftFileURL: URL
+        let swiftFileURL: URL
         let swiftTestsFileURL: URL?
         let hFileURL: URL?
         
