@@ -56,7 +56,10 @@ public class CapacitorPluginPackage {
 
         iosSrcDirectoryURL = URL(filePath: packageJSONParser.iosSrcDirectory, directoryHint: .isDirectory, relativeTo: basePathURL)
 
-        let firstPluginDirectory = packageJSONParser.pluginDirectories.first ?? ""
+        var firstPluginDirectory: String = packageJSONParser.pluginDirectories.first ?? "ios/Plugin/"
+        if (firstPluginDirectory == "ios" || firstPluginDirectory == "ios/" ) {
+            firstPluginDirectory = "ios/Plugin/"
+        }
 
         pluginSrcDirectoryURL = URL(filePath: firstPluginDirectory, directoryHint: .isDirectory, relativeTo: basePathURL)
 
