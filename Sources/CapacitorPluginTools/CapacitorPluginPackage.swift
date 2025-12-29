@@ -3,19 +3,10 @@ import CapacitorPluginSyntaxTools
 import JavascriptPackageTools
 
 public enum CapacitorPluginError: Error {
-    case objcFileCount(Int)
-    case objcHeaderCount(Int)
-    case oldPluginMissing
     case cantFindPluginSwift(String)
 
     public var message: String {
         switch self {
-        case .objcFileCount(let numberOfFiles):
-            return "Found \(numberOfFiles) Objective-C *.m files, expected \(numberOfFiles)"
-        case .oldPluginMissing:
-            return "Can't find OldPlugin"
-        case .objcHeaderCount(let numberOfFiles):
-            return "Found \(numberOfFiles) Objective-C Header files, expected \(numberOfFiles)"
         case .cantFindPluginSwift(let name):
             return "Can't find \(name) or Plugin.swift in directory"
         }
@@ -41,6 +32,7 @@ public class CapacitorPluginPackage {
     private var oldPlugin: OldPlugin?
     private var packageJSONParser: PackageJSONParser
     
+    public var identifier: String?
     public var plugin: CapacitorPlugin? {
         oldPlugin?.capacitorPlugin
     }
@@ -66,56 +58,62 @@ public class CapacitorPluginPackage {
         files = try fileManager.contentsOfDirectory(at: pluginSrcDirectoryURL, includingPropertiesForKeys: nil)
     }
 
-    public func findObjCPluginFile() throws -> URL {
+    public func findObjCPluginFile() -> URL? {
         let mfiles = files.filter { $0.absoluteString.hasSuffix(".m") }
 
-        guard mfiles.count == 1, let url = mfiles.first else { throw CapacitorPluginError.objcFileCount(mfiles.count) }
-        
-        oldPlugin = try OldPlugin(at: url)
-
-        return url
+        if mfiles.count == 1, let url = mfiles.first {
+            return url
+        }
+        return nil
     }
 
     public func parseObjCPluginFile(at url: URL) throws {
         oldPlugin = try OldPlugin(at: url)
+        identifier = oldPlugin?.capacitorPlugin.identifier
     }
 
-    public func findObjCHeaderFile() throws -> URL {
+    public func findObjCHeaderFile() -> URL? {
         let headerFiles = files.filter { $0.absoluteString.hasSuffix(".h") }
-        guard headerFiles.count == 1, let url = headerFiles.first else { throw CapacitorPluginError.objcFileCount(headerFiles.count) }
-
-        return url
+        if headerFiles.count == 1, let url = headerFiles.first {
+            return url
+        }
+        return nil
     }
 
     public func findSwiftPluginFile() throws(CapacitorPluginError) -> URL {
-        guard let oldPlugin else { throw .oldPluginMissing }
+        var fileName = ""
+        if let identifier {
+            fileName = "\(identifier).swift"
+            let fileURL = URL(filePath: fileName,
+                              directoryHint: .notDirectory,
+                              relativeTo: pluginSrcDirectoryURL)
 
-        let fileName = "\(oldPlugin.capacitorPlugin.identifier).swift"
+            if (try? fileURL.checkResourceIsReachable()) == true {
+                return fileURL
+            } else {
+                print("Warning: file \(fileURL.path()) not found, trying Plugin.swift")
+            }
 
-        let fileURL = URL(filePath: fileName,
-                          directoryHint: .notDirectory,
-                          relativeTo: pluginSrcDirectoryURL)
+            let backupFileURL = URL(filePath: "Plugin.swift",
+                                    directoryHint: .notDirectory,
+                                    relativeTo: pluginSrcDirectoryURL)
 
-        if (try? fileURL.checkResourceIsReachable()) == true {
-            return fileURL
+            if (try? backupFileURL.checkResourceIsReachable()) == true {
+                return backupFileURL
+            }
         } else {
-            print("Warning: file \(fileURL.path()) not found, trying Plugin.swift")
-        }
-
-        let backupFileURL = URL(filePath: "Plugin.swift",
-                                directoryHint: .notDirectory,
-                                relativeTo: pluginSrcDirectoryURL)
-
-        if (try? backupFileURL.checkResourceIsReachable()) == true {
-            return backupFileURL
+            let swiftFiles = files.filter { $0.absoluteString.hasSuffix("Plugin.swift") }
+            if swiftFiles.count == 1, let url = swiftFiles.first {
+                return url
+            }
         }
 
         throw .cantFindPluginSwift(fileName)
     }
 
     public func findSwiftTestsPluginFile() -> URL? {
-        if let oldPlugin {
-            let fileName = "\(oldPlugin.capacitorPlugin.identifier)Tests.swift"
+        if let identifier {
+            let fileName = "\(identifier)Tests.swift"
             let fileURL = iosSrcDirectoryURL.appending(path: "PluginTests").appending(path: fileName)
             if (try? fileURL.checkResourceIsReachable()) == true {
                 return fileURL
@@ -156,5 +154,9 @@ public class CapacitorPluginPackage {
         packageJSONParser.files = newFiles
         
         try packageJSONParser.writePackageJSON()
+    }
+
+    public func setIdentifier(from fileURL: URL) throws {
+        identifier = try IdentifierExtractor.getIdentifier(from: fileURL)
     }
 }

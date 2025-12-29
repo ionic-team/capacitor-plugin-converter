@@ -11,7 +11,7 @@ extension Cap2SPM {
     }
     
     func moveSourceDirectories(for package: CapacitorPluginPackage) throws {
-        guard let identifer = package.plugin?.identifier else { return }
+        guard let identifer = package.identifier else { return }
         
         try moveItemCreatingIntermediaryDirectories(at: package.iosSrcDirectoryURL.appending(path: "Plugin"),
                                                     to: package.iosSrcDirectoryURL.appending(path: "Sources").appending(path: identifer))
@@ -94,5 +94,12 @@ extension Cap2SPM {
         var testsText = try String(contentsOf: fileURL, encoding: .utf8)
         testsText.replace("@testable import Plugin\n", with: "@testable import \(target)\n")
         try testsText.write(to: fileURL, atomically: true, encoding: .utf8)
+    }
+
+    func isSwiftFileUpdated(at fileURL: URL) -> Bool {
+        if let swiftText = try? String(contentsOf: fileURL, encoding: .utf8) {
+            return swiftText.contains("CAPBridgedPlugin")
+        }
+        return false
     }
 }
