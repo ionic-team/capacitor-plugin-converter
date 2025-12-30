@@ -121,8 +121,15 @@ public class CapacitorPluginPackage {
                 print("Warning: file \(fileURL.path()) not found, trying PluginTests.swift")
             }
 
-            let backupFileURL = iosSrcDirectoryURL.appending(path: "PluginTests").appending(path: "PluginTests.swift")
+            var backupFileURL = iosSrcDirectoryURL.appending(path: "PluginTests").appending(path: "PluginTests.swift")
 
+            if (try? backupFileURL.checkResourceIsReachable()) == true {
+                return backupFileURL
+            } else {
+                print("Warning: file \(backupFileURL.path()) not found")
+            }
+
+            backupFileURL = iosSrcDirectoryURL.appending(path: "PluginTests").appending(path: fileName.replacingOccurrences(of: "Plugin", with: ""))
             if (try? backupFileURL.checkResourceIsReachable()) == true {
                 return backupFileURL
             }
