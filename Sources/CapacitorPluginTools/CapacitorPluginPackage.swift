@@ -147,18 +147,7 @@ public class CapacitorPluginPackage {
         try? packageJSONParser.changeScript(named: "verify:ios",
                                            to: "xcodebuild -scheme \(podName) -destination generic/platform=iOS")
         
-        var newFiles = packageJSONParser.files
-        
-        newFiles.removeAll(where: { $0 == "ios/Plugin" || $0 == "ios/Plugin/" })
-        
-        if !newFiles.contains(where: { $0 == "ios/"}) {
-            newFiles.append("ios/Sources")
-            newFiles.append("ios/Tests")
-        }
-        
-        newFiles.append("Package.swift")
-        
-        packageJSONParser.files = newFiles
+        packageJSONParser.setFiles()
         
         try packageJSONParser.writePackageJSON()
     }
