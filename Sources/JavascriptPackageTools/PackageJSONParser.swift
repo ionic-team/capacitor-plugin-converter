@@ -10,8 +10,9 @@ public enum PackageJSONError: Error {
 
 public struct PackageJSONParser: CustomDebugStringConvertible {
     private let package: PackageJSON
-    private var json: JSON
+    private let json: JSON
     private let jsonURL: URL
+    public var jsonString: String
     
     public var npmName: String {
         package.name
@@ -22,12 +23,7 @@ public struct PackageJSONParser: CustomDebugStringConvertible {
     }
     
     public var files: [String] {
-        get {
-            package.files
-        }
-        set {
-            json["files"] = JSON(newValue)
-        }
+        package.files
     }
 
     public var podspec: String = ""
@@ -47,35 +43,53 @@ public struct PackageJSONParser: CustomDebugStringConvertible {
 
         return plugins
     }
-    
-    public var jsonString: String? {
-        json.rawString(.utf8, options: [.withoutEscapingSlashes, .prettyPrinted])
-    }
 
     public init(with url: URL) throws {
         jsonURL = url
         
         let data = try Data(contentsOf: url)
         json = try JSON(data: data)
-        
+        jsonString = try String(contentsOf: url, encoding: .utf8)
         package = try JSONDecoder().decode(PackageJSON.self, from: data)
         podspec = try findPodspec()
     }
     
     public mutating func changeScript(named: String, to runString: String) throws(PackageJSONError) {
         if json["scripts"][named] != JSON.null {
-            json["scripts"][named] = JSON(runString)
+            jsonString = jsonString.replacingOccurrences(of: json["scripts"][named].stringValue, with: runString)
         } else {
             throw .scriptEntryNotFound
         }
     }
     
-    public func writePackageJSON() throws {
-        guard let data = jsonString?.data(using: .utf8) else {
-            throw PackageJSONError.jsonStringGenerationFailed
+    public mutating func setFiles() {
+        var replacements: [String] = ["ios/Plugin", "ios/Plugin/"]
+
+        var newFiles: String = """
+            "Package.swift",
+            """
+
+        if !files.contains(where: { $0 == "ios/"}) {
+            newFiles = """
+        "ios/Sources",
+            "ios/Tests",
+            \(newFiles)
+        """
+        } else {
+            replacements.append("ios/")
+            newFiles = """
+        "ios/",
+            \(newFiles)
+        """
         }
-        
-        try data.write(to: jsonURL)
+
+        replacements.forEach {replacement in
+            jsonString = jsonString.replacingOccurrences(of: "\"\(replacement)\",", with: newFiles)
+        }
+    }
+
+    public func writePackageJSON() throws {
+        try jsonString.write(to: jsonURL, atomically: true, encoding: .utf8)
     }
     
     public var debugDescription: String {
